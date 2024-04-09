@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
     // Create a Qt application
     QApplication a(argc, argv);
-    QCoreApplication::setApplicationName("ARAP");
+    QCoreApplication::setApplicationName("Wacky Waves");
     QCoreApplication::setOrganizationName("CS 2240");
     QCoreApplication::setApplicationVersion(QT_VERSION_STR);
 
