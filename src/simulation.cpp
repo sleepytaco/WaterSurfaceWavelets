@@ -13,15 +13,37 @@ Simulation::Simulation() {}
 
 void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 {
-    vector<Vector3f> vertices;
-    vector<Vector3i> triangles;
+    std::vector<Vector3f> vertices;
+    std::vector<Vector3i> triangles;
+    int size = 100;
 
-    // If this doesn't work for you, remember to change your working directory
-    if (MeshLoader::loadTriMesh("meshes/cactus.obj", vertices, triangles)) {
-        m_shape.init(vertices, triangles);
+    for(int i = 0; i < size; ++i){
+        for(int j = 0; j < size; ++j){
+            float period = 8 * M_PI * (i * j)/10000.f;
+            vertices.push_back(Vector3f(j, 10 * sin(period), i));
+        }
     }
 
-    // Please don't touch this code: get min and max for viewport stuff
+    for(int i = 0; i < size - 1; ++i){
+        for(int j = 0; j < size - 1; ++j){
+            int c1 = i + j * size;
+            int c2 = i + 1 + j * size;
+            int c3 = i + (j + 1) * size;
+            int c4 = i + 1 + (j + 1) * size;
+
+            triangles.push_back(Vector3i(c3, c4, c1));
+            triangles.push_back(Vector3i(c4, c2, c1));
+        }
+
+    }
+
+
+
+
+
+    m_shape.init(vertices, triangles);
+
+
     MatrixX3f all_vertices = MatrixX3f(vertices.size(), 3);
     int i = 0;
     for (unsigned long i = 0; i < vertices.size(); ++i) {
