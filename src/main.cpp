@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QSurfaceFormat>
 #include <QScreen>
+#include <iostream>
 #include "profilebuffer.h"
 
 int main(int argc, char *argv[])
@@ -33,9 +34,6 @@ int main(int argc, char *argv[])
         w.show();
     else
         w.showMaximized();
-
-    ProfileBuffer pf = ProfileBuffer();
-    pf.precomputeProfileBuffers(100);
 
     return a.exec();
 }

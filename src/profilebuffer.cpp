@@ -14,9 +14,7 @@ void ProfileBuffer::precomputeProfileBuffers(double time) {
         FUNCTION fun = integrand(p, time);
         double value = integrate(waveNumberMin, waveNumberMax, fun);
         m_buffer[i] = value;
-        std::cout << value << " ";
     }
-    std::cout << std::endl;
 }
 
 double ProfileBuffer::getValueAt(double p) {
