@@ -47,13 +47,10 @@ private:
     Simulation    m_sim;
     Camera  m_camera;
     Shader *m_defaultShader;
-    Shader *m_pointShader;
 
     bool m_isMoving = false;
 
     float m_movementScaling;
-    float m_vertexSelectionThreshold;
-    float m_vSize;
 
     // Timing
     QElapsedTimer m_deltaTimeProvider; // For measuring elapsed time

@@ -55,7 +55,8 @@ add_executable(${PROJECT_NAME}
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
-add_library(StaticGLEW STATIC glew/src/glew.c)
+add_library(StaticGLEW STATIC glew/src/glew.c
+    src/profilebuffer.h src/profilebuffer.cpp)
 include_directories(${PROJECT_NAME} PRIVATE glew/include)
 
 # Specifies libraries to be linked (Qt components, glew, etc)
@@ -82,9 +83,9 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
     FILES
         resources/shaders/shader.frag
         resources/shaders/shader.vert
-        resources/shaders/anchorPoint.vert
-        resources/shaders/anchorPoint.geom
-        resources/shaders/anchorPoint.frag
+
+
+
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

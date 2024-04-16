@@ -15,10 +15,7 @@ GLWidget::GLWidget(QWidget *parent) :
     m_sim(),
     m_camera(),
     m_defaultShader(),
-    m_pointShader(),
-    m_vSize(),
     m_movementScaling(),
-    m_vertexSelectionThreshold(),
     // Movement
     m_deltaTimeProvider(),
     m_intervalTimer(),
@@ -50,7 +47,6 @@ GLWidget::GLWidget(QWidget *parent) :
 GLWidget::~GLWidget()
 {
     if (m_defaultShader != nullptr) delete m_defaultShader;
-    if (m_pointShader   != nullptr) delete m_pointShader;
 }
 
 // ================== Basic OpenGL Overrides
@@ -73,7 +69,6 @@ void GLWidget::initializeGL()
 
     // Initialize shaders
     m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");
-    m_pointShader   = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
 
     // Initialize ARAP, and get parameters needed to decide the camera position, etc
     Vector3f coeffMin, coeffMax;
@@ -82,14 +77,9 @@ void GLWidget::initializeGL()
     Vector3f center = (coeffMax + coeffMin) / 2.0f;
     float extentLength  = (coeffMax - coeffMin).norm();
 
-    // Screen-space size of vertex points
-    m_vSize = 0.005 * extentLength;
-
     // Scale all movement by this amount
     m_movementScaling = extentLength * 0.5;
 
-    // When raycasting, select closest vertex within this distance
-    m_vertexSelectionThreshold = extentLength * 0.025;
 
     // Note for maintainers: Z-up
     float fovY = 120;
@@ -119,14 +109,7 @@ void GLWidget::paintGL()
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    m_pointShader->bind();
-    m_pointShader->setUniform("proj",   m_camera.getProjection());
-    m_pointShader->setUniform("view",   m_camera.getView());
-    m_pointShader->setUniform("vSize",  m_vSize);
-    m_pointShader->setUniform("width",  width());
-    m_pointShader->setUniform("height", height());
-    m_sim.draw(m_pointShader, GL_POINTS);
-    m_pointShader->unbind();
+
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -160,22 +143,14 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
     // Get closest vertex to ray
     const Vector3f ray = transformToWorldRay(currX, currY);
-    const int closest_vertex = m_sim.getClosestVertex(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
 
     // Switch on button
     switch (event->button()) {
-    case Qt::MouseButton::RightButton: {
-        // Capture
-        m_rightCapture = true;
-        // Anchor/un-anchor the vertex
-        m_rightClickSelectMode = m_sim.select(m_pointShader, closest_vertex);
-        break;
-    }
+
     case Qt::MouseButton::LeftButton: {
         // Capture
         m_leftCapture = true;
         // Select this vertex
-        m_lastSelectedVertex = closest_vertex;
         break;
     }
     default: break;
@@ -201,33 +176,17 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     const Vector3f ray = transformToWorldRay(event->position().x(), event->position().y());
     Vector3f pos;
 
-    // If right is held down
-    if (m_rightCapture) {
-        // Get closest vertex to ray
-        const int closest_vertex = m_sim.getClosestVertex(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
 
-        // Anchor/un-anchor the vertex
-        if (m_rightClickSelectMode == SelectMode::None) {
-            m_rightClickSelectMode = m_sim.select(m_pointShader, closest_vertex);
-        } else {
-            m_sim.selectWithSpecifiedMode(m_pointShader, closest_vertex, m_rightClickSelectMode);
-        }
-
-        return;
-    }
 
     // If the selected point is an anchor point
-    if (m_lastSelectedVertex != -1 && m_sim.getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
-        // Move it
-        m_sim.move(m_lastSelectedVertex, pos);
-    } else {
-        // Rotate the camera
-        const int deltaX = currX - m_lastX;
-        const int deltaY = currY - m_lastY;
-        if (deltaX != 0 || deltaY != 0) {
-            m_camera.rotate(deltaY * ROTATE_SPEED, -deltaX * ROTATE_SPEED);
-        }
+
+    // Rotate the camera
+    const int deltaX = currX - m_lastX;
+    const int deltaY = currY - m_lastY;
+    if (deltaX != 0 || deltaY != 0) {
+        m_camera.rotate(deltaY * ROTATE_SPEED, -deltaX * ROTATE_SPEED);
     }
+
 
     // Set last mouse coordinates
     m_lastX = currX;
@@ -262,8 +221,6 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_F: m_vertical -= SPEED; break;
     case Qt::Key_R: m_vertical += SPEED; break;
     case Qt::Key_C: m_camera.toggleIsOrbiting(); break;
-    case Qt::Key_Equal: m_vSize *= 11.0f / 10.0f; break;
-    case Qt::Key_Minus: m_vSize *= 10.0f / 11.0f; break;
     case Qt::Key_Escape: QApplication::quit();
     }
 }
