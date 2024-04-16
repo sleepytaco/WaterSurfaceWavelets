@@ -1,6 +1,7 @@
 #include "profilebuffer.h"
 #include <iostream>
 #include <cmath>
+#include <cassert>
 
 ProfileBuffer::ProfileBuffer()
 {
