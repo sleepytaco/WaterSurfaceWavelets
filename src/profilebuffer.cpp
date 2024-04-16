@@ -9,7 +9,7 @@ ProfileBuffer::ProfileBuffer()
 }
 
 // The profiles this produces are very small in magnitude (like 0.001) but the visualization looks wave-like, maybe we just need to scale it?
-void ProfileBuffer::precomputeProfileBuffers(double time) {
+void ProfileBuffer::precompute(double time) {
     for (int i = 0; i < bufferSize; ++i) {
         double p = (i * bufferExtent) / bufferSize;
         FUNCTION fun = integrand(p, time);

@@ -1,8 +1,10 @@
 #include "Eigen/Dense"
+#include "profilebuffer.h"
 #include <iostream>
 #include <unordered_set>
 #include <deque>
 #include <set>
+#include <vector>
 
 using namespace Eigen;
 using namespace std;
@@ -18,17 +20,23 @@ public:
     void setThetaMinMax(float thetaMin, float thetaMax);
     void setKMinMax(float kMin, float kMax);
 
-    float getAmplitudeVal(Vector2i a, int b, int c); // gets the amplitude value stored in the grid
-    float getInterpolatedAmplitudeVal(Vector2f x, Vector2f k); // find the relevant
-
     Vector2d idxToPos(int i, int j);
     Vector2d posToIdxSpace(Vector2d pos); // returns (a, b) in "index space" eg. a = i + 0.123, b = j = 0.456
 
     double interpolateAmplitude(Vector2d idxSpacePos); // interpolate 4 nearest points
 
     // eqn 17 in paper
+    double advectionSpeed(double waveNumber);
     Vector2d advectionPos(Vector2d pos, double dt, double theta, double waveNumber);
     void advectionStep(double dt);
+
+     // eqn 16 in paper
+    double getInterpolatedAmplitude(Vector2d x, double theta, double waveNumber);
+
+    void precomputeProfileBuffers(double time);
+
+    double waterHeight(Vector2d pos);
+
 private:
     // index into x, y, theta, k
     float dx, dy;
@@ -45,6 +53,14 @@ private:
     int k;
     int theta;
 
+    int numWaveNumberSamples = 400;
+    int numThetaSamples = 120; // number of samples for integrating water height
+
+    double wavelengthMin = 0.02; // note: if these are changed so should the values in profilebuffer.h, these should be moved to a config file
+    double wavelengthMax = 13.0;
+
+    double m_time = 0.0; // accumulate time across timesteps
+
     vector<float> amplitudeGrid;
 // TODO: make Grid4d class
 //    Grid4d currAmplitude;
@@ -57,5 +73,7 @@ private:
     float yMin; float yMax;
     float thetaMin; float thetaMax;
     float kMin; float kMax;
+
+    ProfileBuffer m_profileBuffer;
 };
 

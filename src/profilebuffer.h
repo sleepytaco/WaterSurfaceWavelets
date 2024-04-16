@@ -11,7 +11,7 @@ class ProfileBuffer
 public:
     ProfileBuffer();
 
-    void precomputeProfileBuffers(double time);
+    void precompute(double time);
     double getValueAt(double p);
     void integrationTest(); // temporary
 
