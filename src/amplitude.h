@@ -18,11 +18,21 @@ public:
     void setThetaMinMax(float thetaMin, float thetaMax);
     void setKMinMax(float kMin, float kMax);
 
-    float getAmplitudeVal(int a, int b, int c) {return amplitudeGrid[a][a][b][c];}; // gets the amplitude value stored in the grid
+    float getAmplitudeVal(Vector2i a, int b, int c); // gets the amplitude value stored in the grid
     float getInterpolatedAmplitudeVal(Vector2f x, Vector2f k); // find the relevant
 private:
     // index into x, y, theta, k
-    vector<vector<vector<vector<float>>>> amplitudeGrid;
+
+    int w;
+    int h;
+    int k;
+    int theta;
+
+
+    vector<float> amplitudeGrid;
+
+
+    int gridIndex(size_t i1, size_t i2, size_t i3, size_t i4){ return i1 + w * (i2 + h * (i3 * k + i4));};
 
     // simulation domain range
     float xMin; float xMax;
