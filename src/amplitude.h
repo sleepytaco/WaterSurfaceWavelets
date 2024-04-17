@@ -19,13 +19,11 @@ class Amplitude
 {
 public:
     Amplitude();
-    Amplitude(int xSamples, int thetaSamples, int kSamples);
-
 
     void setXMinMax(float min, float max) { xMin = min; xMax = max; dXY = (xMax - xMin) / dimXY;};
-    void setYMinMax(float min, float max) { yMin = min; yMax = max; dXY = (yMax - yMin) / dimXY;};;
-    void setThetaMinMax(float min, float max) { thetaMin = min; thetaMax = max; dTheta = (thetaMax - thetaMin) / dimTheta;};;
-    void setKMinMax(float min, float max) { kMin = min; kMax = max; dK = (kMax - kMin) / dimK;};;
+    void setYMinMax(float min, float max) { yMin = min; yMax = max; dXY = (yMax - yMin) / dimXY;};
+    void setThetaMinMax(float min, float max) { thetaMin = min; thetaMax = max; dTheta = (thetaMax - thetaMin) / dimTheta;};
+    void setKMinMax(float min, float max) { kMin = min; kMax = max; dK = (kMax - kMin) / dimK;};
 
     Vector2d idxToPos(int i, int j);
     Vector2d posToIdxSpace(Vector2d pos); // returns (a, b) in "index space" eg. a = i + 0.123, b = j = 0.456
@@ -55,9 +53,9 @@ private:
     double m_time = 0.0; // accumulate time across timesteps
 
     // number of samples for 4D amplitude grid
-    int dimXY = 1024;
-    int dimTheta = 16;
-    int dimK = 1;
+    const int dimXY = 256;
+    const int dimTheta = 16;
+    const int dimK = 1;
 
 
     // simulation domain range

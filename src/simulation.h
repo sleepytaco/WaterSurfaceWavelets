@@ -12,7 +12,6 @@ class Simulation
 {
 private:
     Shape m_shape;
-    Grid m_grid;
     Amplitude m_amplitude;
 
 public:

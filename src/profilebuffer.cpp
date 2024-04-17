@@ -5,7 +5,7 @@
 
 ProfileBuffer::ProfileBuffer()
 {
-
+    std::cout << "profile buffer constructor" << std::endl;
 }
 
 // The profiles this produces are very small in magnitude (like 0.001) but the visualization looks wave-like, maybe we just need to scale it?
@@ -23,8 +23,11 @@ double ProfileBuffer::getValueAt(double p) {
     int prev = (int)floor(interpolatePos);
     int next = prev + 1;
     double remainder = interpolatePos - prev;
-    int prevWrapped = prev % bufferSize; // wrap for if p is outside of buffer
-    int nextWrapped = next % bufferSize;
+    // https://stackoverflow.com/questions/3417183/modulo-of-negative-numbers
+    int prevWrapped = (prev % bufferSize + bufferSize) % bufferSize; // wrap for if p is outside of buffer
+    int nextWrapped = (next % bufferSize + bufferSize) % bufferSize;
+    assert(prevWrapped >= 0 && prevWrapped < bufferSize);
+    assert(nextWrapped >= 0 && nextWrapped < bufferSize);
     return m_buffer[prevWrapped] * remainder + m_buffer[nextWrapped] * (1 - remainder);
 }
 
@@ -33,7 +36,7 @@ double ProfileBuffer::getValueAt(double p) {
 double ProfileBuffer::spectrum(double omega) {
     const static double A = 0.0081 * pow(g, 2);
     const static double B = 0.6858 * pow(g/U, 4);
-    return A / pow(omega, 5) * exp(-B / pow(omega, 4)) * 5;
+    return A / pow(omega, 5) * exp(-B / pow(omega, 4));
 }
 
 FUNCTION ProfileBuffer::integrand(double p, double time) {

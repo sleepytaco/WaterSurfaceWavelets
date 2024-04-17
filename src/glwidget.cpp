@@ -31,6 +31,8 @@ GLWidget::GLWidget(QWidget *parent) :
     m_rightClickSelectMode(SelectMode::None),
     m_lastSelectedVertex(-1)
 {
+    std::cout << "glwidget constructor" << std::endl;
+
     // GLWidget needs all mouse move events, not just mouse drag events
     setMouseTracking(true);
 
@@ -64,8 +66,6 @@ void GLWidget::initializeGL()
 
     // Enable depth-testing and backface culling
     glEnable(GL_DEPTH_TEST);
-//    glEnable(GL_CULL_FACE);
-//    glCullFace(GL_BACK);
 
     // Initialize shaders
     m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");

@@ -10,6 +10,7 @@
 
 int main(int argc, char *argv[])
 {
+
     srand(static_cast<unsigned>(time(0)));
 
     // Create a Qt application

@@ -10,8 +10,16 @@ using namespace std;
 using namespace Eigen;
 
 Simulation::Simulation()
-    : m_amplitude(1024, 16, 1)
+    : m_amplitude()
 {
+    std::cout << "simulation constructor" << std::endl;
+
+    // sample min max simulation ranges from supplemental paper - assuming meters as units
+    // these setters internally calculate the grid cell widths dXY, dTheta, dK
+    m_amplitude.setXMinMax(0, 4000);
+    m_amplitude.setYMinMax(0, 4000);
+    m_amplitude.setThetaMinMax(0, 2*M_PI); // radians
+    m_amplitude.setKMinMax(2.0*M_PI/0.02, 2.0*M_PI/13.0); // wavenumber (k) = 2pi / wavelength (lamdba)
 }
 
 void Simulation::update(double deltaTime) {
@@ -31,10 +39,31 @@ void Simulation::setWaterHeights() {
 
 void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 {
-    std::vector<Vector3f> vertices = this->m_grid.getVertices();
-    std::vector<Vector3i> triangles = this->m_grid.getTriangles();
+    std::vector<Vector3f> vertices;
+    std::vector<Vector3i> triangles;
+    int size = 128;
 
+    for(int i = 0; i < size; ++i){
+        for(int j = 0; j < size; ++j){
+            float period = 8 * M_PI * (i)/100.f;
+            //            vertices.push_back(Vector3f(j, 10 * sin(period), i));
+            vertices.push_back(Vector3f(j, 0, i));
 
+        }
+    }
+
+    for(int i = 0; i < size - 1; ++i){
+        for(int j = 0; j < size - 1; ++j){
+            int c1 = i + j * size;
+            int c2 = i + 1 + j * size;
+            int c3 = i + (j + 1) * size;
+            int c4 = i + 1 + (j + 1) * size;
+
+            triangles.push_back(Vector3i(c3, c4, c1));
+            triangles.push_back(Vector3i(c4, c2, c1));
+        }
+
+    }
 
     m_shape.init(vertices, triangles);
 
