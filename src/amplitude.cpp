@@ -31,10 +31,6 @@ double Amplitude::getInterpolatedAmplitude(Vector2d x, double theta, double wave
     int idxYMin = floor(idxSpaceY);
     int idxThetaMin = floor(idxSpaceTheta);
 
-    double fractionX = idxSpaceX - (double)idxXMin;
-    double fractionY = idxSpaceY - (double)idxYMin;
-    double fractionTheta = idxSpaceTheta - (double)idxThetaMin;
-
     std::vector<double> amplitudes;
     std::vector<double> weights;
 
@@ -65,6 +61,9 @@ double Amplitude::getInterpolatedAmplitude(Vector2d x, double theta, double wave
     for (int i = 0; i < amplitudes.size(); i++) {
         interpolatedAmplitude += amplitudes[i] * weights[i];
     }
+
+    // part that I'm least sure about but I'm not sure what the basis function for wave number is supposed to be besides this
+    interpolatedAmplitude *= m_profileBuffer.spectrum(m_profileBuffer.dispersion(waveNumber));
 
     return interpolatedAmplitude;
 }
