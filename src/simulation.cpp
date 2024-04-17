@@ -12,6 +12,12 @@ using namespace Eigen;
 Simulation::Simulation()
     : m_amplitude(1024, 16, 1)
 {
+    // sample min max simulation ranges from supplemental paper - assuming meters as units
+    // these setters internally calculate the grid cell widths dXY, dTheta, dK
+    m_amplitude.setXMinMax(0, 4000);
+    m_amplitude.setYMinMax(0, 4000);
+    m_amplitude.setThetaMinMax(0, 2*M_PI); // radians
+    m_amplitude.setKMinMax(2.0*M_PI/0.02, 2.0*M_PI/13.0); // wavenumber (k) = 2pi / wavelength (lamdba)
 }
 
 void Simulation::update(double deltaTime) {

@@ -1,9 +1,8 @@
 #include "amplitude.h"
 
 
-Amplitude::Amplitude() {
+Amplitude::Amplitude() {}
 
-}
 Amplitude::Amplitude(int xSamples, int thetaSamples, int kSamples) : dimXY(xSamples), dimTheta(thetaSamples), dimK(kSamples) {
     amplitudeGrid.resize(this->dimXY * this->dimXY * this->dimTheta * this->dimK);
     m_profileBuffer = ProfileBuffer();
@@ -120,6 +119,7 @@ void Amplitude::advectionStep(double dt) {
                 Vector2d advPos = advectionPos(x_a, dt, theta_b, k_c); // pos "back in time" ---- x_jump, y_jump
 
                 // fill in the newAmplitudeGrid with interpolated amplitude values at (x_jump, y_jump)
+                // TODO: turn this simple into cubic spatial interpolation instead of the simple adj amplitude samples weighted avg
                 newAmplitudeGrid[gridIndex(i, j, theta, 0)] += getInterpolatedAmplitude(advPos, theta_b, k_c);
             }
         }
