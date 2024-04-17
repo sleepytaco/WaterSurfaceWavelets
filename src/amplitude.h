@@ -25,7 +25,7 @@ public:
     Vector2d idxToPos(int i, int j);
     Vector2d posToIdxSpace(Vector2d pos); // returns (a, b) in "index space" eg. a = i + 0.123, b = j = 0.456
 
-    double interpolateAmplitude(Vector2d idxSpacePos); // interpolate 4 nearest points
+    double interpolateAmplitude(Vector2d idxSpacePos, double theta); // interpolate 4 nearest points
 
     // eqn 17 in paper
     double advectionSpeed(double waveNumber);

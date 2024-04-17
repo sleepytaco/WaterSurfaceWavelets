@@ -72,6 +72,34 @@ double Amplitude::getInterpolatedAmplitude(Vector2d x, double theta, double wave
     return interpolatedAmplitude;
 }
 
+double Amplitude::interpolateAmplitude(Vector2d idxSpacePos, double theta) {
+
+    // obtain floor of x and y coordinates
+    int i = floor(idxSpacePos[0]);
+    int j = floor(idxSpacePos[1]);
+
+    // obtain relevant values adjacent to idxSpacePos
+    double topLeft     = amplitudeGrid[gridIndex(i  , j  , theta, 0)];
+    double topRight    = amplitudeGrid[gridIndex(i+1, j  , theta, 0)];
+    double bottomLeft  = amplitudeGrid[gridIndex(i  , j+1, theta, 0)];
+    double bottomRight = amplitudeGrid[gridIndex(i+1, j+1, theta, 0)];
+
+    // calculate relative weightings based on distance
+    double weightTopLeft     = (idxSpacePos - Vector2d(i  , j  )).norm();
+    double weightTopRight    = (idxSpacePos - Vector2d(i+1, j  )).norm();
+    double weightBottomLeft  = (idxSpacePos - Vector2d(i  , j+1)).norm();
+    double weightBottomRight = (idxSpacePos - Vector2d(i+1, j+1)).norm();
+
+    // calculate total sum of weights, so we can normalize
+    double normalizeFactor = weightTopLeft + weightTopRight + weightBottomLeft + weightBottomRight;
+
+    // return weighted average of adjacent amplitudes
+    return weightTopLeft     / normalizeFactor * topLeft +
+           weightTopRight    / normalizeFactor * topRight +
+           weightBottomLeft  / normalizeFactor * bottomLeft +
+           weightBottomRight / normalizeFactor * bottomRight;
+}
+
 // advectionStep moves the current amplitudeGrid forward in time
 void Amplitude::advectionStep(double dt) {
 
