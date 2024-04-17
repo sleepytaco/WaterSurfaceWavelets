@@ -3,6 +3,7 @@
 #include "graphics/shape.h"
 #include "Eigen/StdList"
 #include "Eigen/StdVector"
+#include "amplitude.h"
 
 class Shader;
 
@@ -10,12 +11,16 @@ class Simulation
 {
 private:
     Shape m_shape;
+    Amplitude m_amplitude;
 
 public:
     Simulation();
 
+    void update(double deltaTime);
+
+    void setWaterHeights();
+
     void init(Eigen::Vector3f &min, Eigen::Vector3f &max);
-    void move(int vertex, Eigen::Vector3f pos);
 
     // ================== If You Choose To Modify The Code Below, It's On You
 

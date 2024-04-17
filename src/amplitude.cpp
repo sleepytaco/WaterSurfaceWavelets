@@ -1,7 +1,6 @@
 #include "amplitude.h"
 
 Amplitude::Amplitude(int xSamples, int thetaSamples, int kSamples) {
-    amplitudeGrid.resize(this->w * this->h * this->k * this->theta);
     m_profileBuffer = ProfileBuffer();
 }
 
@@ -76,17 +75,23 @@ double Amplitude::waterHeight(Vector2d pos) {
     double totalHeight = 0;
 
     for (int b = 1; b <= numThetaSamples; b++) {
-        double theta = 2.0 * M_PI * (double)b / (double)numThetaSamples;
+        double theta = 2.0 * M_PI * (double)b / numThetaSamples;
         Vector2d waveDirection = Vector2d(cos(theta), sin(theta));
         double p = waveDirection.dot(pos);
 
         for (int c = 1; c <= numWaveNumberSamples; c++) {
-            double fraction = (double)c / (double)numWaveNumberSamples;
+            double fraction = (double)c / numWaveNumberSamples;
             double wavelength = wavelengthMax * fraction + wavelengthMin * (1 - fraction); // not 100% sure on this
             double waveNumber = 2.0 * M_PI / wavelength;
-            totalHeight += getInterpolatedAmplitude(pos, theta, waveNumber) * m_profileBuffer.getValueAt(p); // no shot this works first time. check here when things inevitably break
+            totalHeight += /*getInterpolatedAmplitude(pos, theta, waveNumber) * */m_profileBuffer.getValueAt(p); // no shot this works first time. check here when things inevitably break
         }
     }
 
     return totalHeight;
+}
+
+void Amplitude::timeStep(double dt) {
+    m_time += dt;
+    //advectionStep(dt);
+    precomputeProfileBuffers(m_time);
 }

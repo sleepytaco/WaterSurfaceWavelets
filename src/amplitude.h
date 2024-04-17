@@ -6,6 +6,8 @@
 #include <set>
 #include <vector>
 
+#pragma once
+
 using namespace Eigen;
 using namespace std;
 
@@ -37,6 +39,8 @@ public:
 
     double waterHeight(Vector2d pos);
 
+    void timeStep(double dt);
+
 private:
     // index into x, y, theta, k
     float dx, dy;
@@ -53,13 +57,13 @@ private:
     int k;
     int theta;
 
-    int numWaveNumberSamples = 400;
-    int numThetaSamples = 120; // number of samples for integrating water height
+    int numWaveNumberSamples = 1;
+    int numThetaSamples = 16; // number of samples for integrating water height
 
     double wavelengthMin = 0.02; // note: if these are changed so should the values in profilebuffer.h, these should be moved to a config file
     double wavelengthMax = 13.0;
 
-    double m_time = 0.0; // accumulate time across timesteps
+    double m_time = 10.0; // accumulate time across timesteps, for some reason first few seconds are cursed so we skip to 10s
 
     vector<float> amplitudeGrid;
 // TODO: make Grid4d class

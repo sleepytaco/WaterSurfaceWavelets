@@ -33,7 +33,7 @@ double ProfileBuffer::getValueAt(double p) {
 double ProfileBuffer::spectrum(double omega) {
     const static double A = 0.0081 * pow(g, 2);
     const static double B = 0.6858 * pow(g/U, 4);
-    return A / pow(omega, 5) * exp(-B / pow(omega, 4));
+    return A / pow(omega, 5) * exp(-B / pow(omega, 4)) * 5;
 }
 
 FUNCTION ProfileBuffer::integrand(double p, double time) {
@@ -53,19 +53,19 @@ FUNCTION ProfileBuffer::integrand(double p, double time) {
     };
 }
 
+
+// Simpson's 1/3 rule: https://en.wikipedia.org/wiki/Simpson%27s_rule
 double ProfileBuffer::integrate(double minBound, double maxBound, FUNCTION& fun) {
     double delta = (maxBound - minBound) / numSubintervals;
-    double cur = minBound + delta / 2;
-    double midpointSum = 0.0;
-    while (true) {
-        midpointSum += fun(cur) * delta;
-        cur += delta;
-        if ((minBound <= maxBound && cur >= maxBound - delta / 2)
-         || (minBound >= maxBound && cur <= maxBound - delta / 2)) {
-            break;
-        }
+    double integral = 0.0;
+    double x = minBound;
+
+    for (int i = 0; i < numSubintervals; ++i) {
+        integral += delta / 6.0 * (fun(x) + 4 * fun(x + delta / 2) + fun(x + delta));
+        x += delta;
     }
-    return midpointSum;
+
+    return integral;
 }
 
 void ProfileBuffer::integrationTest() {

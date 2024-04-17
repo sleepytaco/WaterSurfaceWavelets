@@ -64,8 +64,8 @@ void GLWidget::initializeGL()
 
     // Enable depth-testing and backface culling
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+//    glEnable(GL_CULL_FACE);
+//    glCullFace(GL_BACK);
 
     // Initialize shaders
     m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");
@@ -255,6 +255,7 @@ void GLWidget::tick()
     moveVec *= m_movementScaling;
     moveVec *= deltaSeconds;
     m_camera.move(moveVec);
+    m_sim.update((double)deltaSeconds);
 
     // Flag this view for repainting (Qt will call paintGL() soon after)
     update();
