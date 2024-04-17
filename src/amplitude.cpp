@@ -1,10 +1,22 @@
 #include "amplitude.h"
-
+#include <random>
 
 Amplitude::Amplitude() {
     std::cout << "amplitude constructor" << std::endl;
+    double lower_bound = 20;
+    double upper_bound = -20;
+    std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
+    std::default_random_engine re;
+
     m_currentAmplitude = Grid();
     m_newAmplitude = Grid();
+    for (int i=0; i<dimXY; ++i) { // a
+        for (int j=0; j<dimXY; ++j) { // a
+            for (int theta=0; theta<dimTheta; ++theta) { // b
+                m_currentAmplitude.get(i, j, theta, 0) = unif(re);
+            }
+        }
+    }
     m_profileBuffer = ProfileBuffer();
 }
 
@@ -73,8 +85,7 @@ double Amplitude::interpolateAmplitude4d(Vector2d x, double theta, double waveNu
     }
 
     // part that I'm least sure about but I'm not sure what the basis function for wave number is supposed to be besides this
-    interpolatedAmplitude *= m_profileBuffer.spectrum(m_profileBuffer.dispersion(waveNumber));
-
+//    interpolatedAmplitude *= m_profileBuffer.spectrum(m_profileBuffer.dispersion(waveNumber));
     return interpolatedAmplitude;
 }
 
@@ -117,12 +128,9 @@ void Amplitude::advectionStep(double dt) {
                 double k_c = dK;
                 Vector2d advPos = advectionPos(x_a, dt, theta_b, k_c); // pos "back in time" ---- x_jump, y_jump
                 Vector2d idxSpaceAdvPos = posToIdxSpace(advPos);
-
                 // fill in the newAmplitudeGrid with interpolated amplitude values at (x_jump, y_jump)
                 // TODO: turn this simple into cubic spatial interpolation instead of the simple adj amplitude samples weighted avg
-//                m_newAmplitude(i, j, theta, 0) = interpolateAmplitude(idxSpaceAdvPos, theta);
-                m_newAmplitude.get(i, j, theta, 0) = 1;
-
+                m_newAmplitude.get(i, j, theta, 0) = interpolateAmplitude(idxSpaceAdvPos, theta);
             }
         }
     }
@@ -146,7 +154,7 @@ double Amplitude::waterHeight(Vector2d pos) {
             double fraction = (double)c / (double)numWaveNumberSamples;
             double wavelength = wavelengthMax * fraction + wavelengthMin * (1 - fraction); // not 100% sure on this
             double waveNumber = 2.0 * M_PI / wavelength;
-            totalHeight += /*interpolateAmplitude4d(pos, theta, waveNumber) * */m_profileBuffer.getValueAt(p); // no shot this works first time. check here when things inevitably break
+            totalHeight += interpolateAmplitude4d(pos, theta, waveNumber) * m_profileBuffer.getValueAt(p); // no shot this works first time. check here when things inevitably break
         }
     }
 

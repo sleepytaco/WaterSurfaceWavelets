@@ -23,7 +23,7 @@ public:
     void setXMinMax(float min, float max) { xMin = min; xMax = max; dXY = (xMax - xMin) / dimXY;};
     void setYMinMax(float min, float max) { yMin = min; yMax = max; dXY = (yMax - yMin) / dimXY;};
     void setThetaMinMax(float min, float max) { thetaMin = min; thetaMax = max; dTheta = (thetaMax - thetaMin) / dimTheta;};
-    void setKMinMax(float min, float max) { kMin = min; kMax = max; dK = (kMax - kMin) / dimK;};
+    void setKMinMax(float min, float max) { kMin = min; kMax = max; dK = (kMin - kMax) / 2;};
 
     Vector2d idxToPos(int i, int j);
     Vector2d posToIdxSpace(Vector2d pos); // returns (a, b) in "index space" eg. a = i + 0.123, b = j = 0.456
