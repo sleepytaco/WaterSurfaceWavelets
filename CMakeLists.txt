@@ -41,6 +41,9 @@ add_executable(${PROJECT_NAME}
     src/amplitude.h
     src/amplitude.cpp
 
+    src/profilebuffer.h
+    src/profilebuffer.cpp
+
     src/mainwindow.h
     src/simulation.h
     src/glwidget.h
