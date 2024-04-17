@@ -5,7 +5,8 @@ Amplitude::Amplitude() {
 
 }
 Amplitude::Amplitude(int xSamples, int thetaSamples, int kSamples) : dimXY(xSamples), dimTheta(thetaSamples), dimK(kSamples) {
-    amplitudeGrid.resize(this->dimXY * this->dimXY * this->dimTheta * this->dimK);
+    m_currentAmplitude = Grid();
+    m_newAmplitude = Grid();
     m_profileBuffer = ProfileBuffer();
 }
 
@@ -29,7 +30,7 @@ Vector2d Amplitude::advectionPos(Vector2d pos, double dt, double theta, double w
     return pos - dt * advectionSpeed(waveNumber) * waveDirection;
 }
 
-double Amplitude::getInterpolatedAmplitude(Vector2d x, double theta, double waveNumber) {
+double Amplitude::interpolateAmplitude4d(Vector2d x, double theta, double waveNumber) {
     Vector2d idxSpacePos = posToIdxSpace(x);
     double idxSpaceX = idxSpacePos.x();
     double idxSpaceY = idxSpacePos.y();
@@ -47,8 +48,7 @@ double Amplitude::getInterpolatedAmplitude(Vector2d x, double theta, double wave
     for (int i = idxXMin; i <= idxXMin + 1; i++) {
         for (int j = idxYMin; j <= idxYMin + 1; j++) {
             for (int k = idxThetaMin; k <= idxThetaMin + 1; k++) {
-                //double amplitude = currAmplitude.get(i, j, k, 0); // we can just have one amplitudeGrid variable instead of two...
-                double amplitude = amplitudeGrid[gridIndex(i, j, k, 0)]; // 1.234; // temp so that code compiles
+                double amplitude = m_currentAmplitude(i, j, k, 0);
                 double weight = (Vector3d((double)i, (double)j, (double)k) - Vector3d(idxSpaceX, idxSpaceY, idxSpaceTheta)).norm();
                 amplitudes.push_back(amplitude);
                 weights.push_back(weight);
@@ -78,10 +78,6 @@ double Amplitude::getInterpolatedAmplitude(Vector2d x, double theta, double wave
 
 // advectionStep moves the current amplitudeGrid forward in time
 void Amplitude::advectionStep(double dt) {
-
-    // notes: we don't need a seprate member var for newAmplitudeGrid... eqn 17 suggests using a single amplitudeGrid var to fill in newAmplitudeGrid
-    std::vector<double> newAmplitudeGrid(amplitudeGrid.size(), 0);
-
     for (int i=0; i<dimXY; ++i) { // a
         for (int j=0; j<dimXY; ++j) { // a
             for (int theta=0; theta<dimTheta; ++theta) { // b
@@ -90,14 +86,15 @@ void Amplitude::advectionStep(double dt) {
                 double k_c = dK;
 
                 Vector2d advPos = advectionPos(x_a, dt, theta_b, k_c); // pos "back in time" ---- x_jump, y_jump
+                Vector2d idxSpaceAdvPos = posToIdxSpace(advPos);
 
                 // fill in the newAmplitudeGrid with interpolated amplitude values at (x_jump, y_jump)
-                newAmplitudeGrid[gridIndex(i, j, theta, 0)] += getInterpolatedAmplitude(advPos, theta_b, k_c);
+                m_newAmplitude(i, j, theta, 0) += interpolateAmplitude(idxSpaceAdvPos, theta);
             }
         }
     }
 
-    amplitudeGrid = newAmplitudeGrid;
+    std::swap(m_newAmplitude, m_currentAmplitude);
 }
 
 void Amplitude::precomputeProfileBuffers(double time) {
@@ -116,7 +113,7 @@ double Amplitude::waterHeight(Vector2d pos) {
             double fraction = (double)c / numWaveNumberSamples;
             double wavelength = wavelengthMax * fraction + wavelengthMin * (1 - fraction); // not 100% sure on this
             double waveNumber = 2.0 * M_PI / wavelength;
-            totalHeight += /*getInterpolatedAmplitude(pos, theta, waveNumber) * */m_profileBuffer.getValueAt(p); // no shot this works first time. check here when things inevitably break
+            totalHeight += interpolateAmplitude4d(pos, theta, waveNumber) * m_profileBuffer.getValueAt(p); // no shot this works first time. check here when things inevitably break
         }
     }
 
@@ -125,6 +122,6 @@ double Amplitude::waterHeight(Vector2d pos) {
 
 void Amplitude::timeStep(double dt) {
     m_time += dt;
-    //advectionStep(dt);
+    advectionStep(dt);
     precomputeProfileBuffers(m_time);
 }

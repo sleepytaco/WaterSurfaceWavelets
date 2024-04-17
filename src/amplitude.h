@@ -30,7 +30,7 @@ public:
     Vector2d idxToPos(int i, int j);
     Vector2d posToIdxSpace(Vector2d pos); // returns (a, b) in "index space" eg. a = i + 0.123, b = j = 0.456
 
-    double interpolateAmplitude(Vector2d idxSpacePos); // interpolate 4 nearest points
+    double interpolateAmplitude(Vector2d idxSpacePos, int thetaIdx); // interpolate 4 nearest points
 
     // eqn 17 in paper
     double advectionSpeed(double waveNumber);
@@ -38,7 +38,7 @@ public:
     void advectionStep(double dt);
 
      // eqn 16 in paper
-    double getInterpolatedAmplitude(Vector2d x, double theta, double waveNumber);
+    double interpolateAmplitude4d(Vector2d x, double theta, double waveNumber);
 
     void precomputeProfileBuffers(double time);
 
@@ -46,14 +46,10 @@ public:
 
     void timeStep(double dt);
 
-
-
-    float getInterpolatedAmplitudeVal(Vector2f x, Vector2f k); // find the relevant
-
 private:
 
-
-    Grid m_grid;
+    Grid m_currentAmplitude;
+    Grid m_newAmplitude;
 
 
     double m_time = 0.0; // accumulate time across timesteps
@@ -77,19 +73,6 @@ private:
     // number of samples for integrating water height
     int numWaveNumberSamples = 1;
     int numThetaSamples = 16;
-
-    std::vector<double> amplitudeGrid;
-// TODO: make Grid4d class
-    // we don't need two variables
-//    Grid4d currAmplitude;
-//    Grid4d newAmplitude;
-
-    //    int w; // dimXY
-    //    int h; // dimXY
-    //    int k; // dimK
-    //    int theta; // dimTheta
-    // assumed index order: x, y, theta, k
-    int gridIndex(size_t i1, size_t i2, size_t i3, size_t i4){ return i1 + dimXY * (i2 + dimTheta * (i3 * dimK + i4));};
 
     ProfileBuffer m_profileBuffer;
 };

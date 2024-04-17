@@ -2,32 +2,36 @@
 
 Grid::Grid()
 {
-    size_t gridSize = this->dims * this->dims * this->k * this->theta;
-    this->amplitudeGrid.resize(gridSize);
-    this->gridStep.resize(gridSize);
+    size_t gridSize = dims * dims * k * theta;
+    amplitudeGrid.resize(gridSize);
+    gridStep.resize(gridSize);
 
-    for(int i = 0; i < this->mesh_dims; ++i){
-        for(int j = 0; j < this->mesh_dims; ++j){
+    for(int i = 0; i < mesh_dims; ++i){
+        for(int j = 0; j < mesh_dims; ++j){
             float period = 8 * M_PI * (i)/100.f;
-            this->vertices.push_back(Vector3f(j, 10 * sin(period), i));
+            vertices.push_back(Vector3f(j, 10 * sin(period), i));
         }
     }
 
-    for(int i = 0; i < this->mesh_dims - 1; ++i){
-        for(int j = 0; j < this->mesh_dims- 1; ++j){
-            int c1 = i + j * this->mesh_dims;
-            int c2 = i + 1 + j * this->mesh_dims;
-            int c3 = i + (j + 1) * this->mesh_dims;
-            int c4 = i + 1 + (j + 1) * this->mesh_dims;
+    for(int i = 0; i < mesh_dims - 1; ++i){
+        for(int j = 0; j < mesh_dims- 1; ++j){
+            int c1 = i + j * mesh_dims;
+            int c2 = i + 1 + j * mesh_dims;
+            int c3 = i + (j + 1) * mesh_dims;
+            int c4 = i + 1 + (j + 1) * mesh_dims;
 
-            this->triangles.push_back(Vector3i(c3, c4, c1));
-            this->triangles.push_back(Vector3i(c4, c2, c1));
+            triangles.push_back(Vector3i(c3, c4, c1));
+            triangles.push_back(Vector3i(c4, c2, c1));
         }
 
     }
 }
 
 
-float Grid::getAmplitudeVal(Vector2i a, int b, int c){
-    return this->gridIndex(a(0), a(1), b, c);
+double& Grid::operator()(Vector2i pos, int theta, int k) {
+    return amplitudeGrid[gridIndex(pos(0), pos(1), theta, k)];
+}
+
+double& Grid::operator()(int x, int y, int theta, int k) {
+    return amplitudeGrid[gridIndex(x,  y, theta, k)];
 }
