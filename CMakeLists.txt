@@ -41,6 +41,9 @@ add_executable(${PROJECT_NAME}
     src/amplitude.h
     src/amplitude.cpp
 
+    src/profilebuffer.h
+    src/profilebuffer.cpp
+
     src/mainwindow.h
     src/simulation.h
     src/glwidget.h
@@ -52,6 +55,8 @@ add_executable(${PROJECT_NAME}
 
     util/tiny_obj_loader.h
     util/unsupportedeigenthing/OpenGLSupport
+    src/diffusion.h src/diffusion.cpp
+    src/grid.h src/grid.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`

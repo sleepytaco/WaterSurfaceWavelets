@@ -1,5 +1,4 @@
 #include "simulation.h"
-#include "graphics/meshloader.h"
 #include "amplitude.h"
 
 #include <iostream>
@@ -32,31 +31,10 @@ void Simulation::setWaterHeights() {
 
 void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 {
-    std::vector<Vector3f> vertices;
-    std::vector<Vector3i> triangles;
-    int size = 64;
+    std::vector<Vector3f> vertices = this->m_grid.getVertices();
+    std::vector<Vector3i> triangles = this->m_grid.getTriangles();
 
-    for(int i = 0; i < size; ++i){
-        for(int j = 0; j < size; ++j){
-            float period = 8 * M_PI * (i)/100.f;
-//            vertices.push_back(Vector3f(j, 10 * sin(period), i));
-            vertices.push_back(Vector3f(j, 0, i));
 
-        }
-    }
-
-    for(int i = 0; i < size - 1; ++i){
-        for(int j = 0; j < size - 1; ++j){
-            int c1 = i + j * size;
-            int c2 = i + 1 + j * size;
-            int c3 = i + (j + 1) * size;
-            int c4 = i + 1 + (j + 1) * size;
-
-            triangles.push_back(Vector3i(c3, c4, c1));
-            triangles.push_back(Vector3i(c4, c2, c1));
-        }
-
-    }
 
     m_shape.init(vertices, triangles);
 

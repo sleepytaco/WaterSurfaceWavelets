@@ -1,5 +1,9 @@
 #include "Eigen/Dense"
+
+#include "grid.h"
+
 #include "profilebuffer.h"
+
 #include <iostream>
 #include <unordered_set>
 #include <deque>
@@ -9,13 +13,14 @@
 #pragma once
 
 using namespace Eigen;
-using namespace std;
 
 // class to represent the discretized 4D amplitude function; this amplitude A is the simulation variable
 class Amplitude
 {
 public:
+    Amplitude();
     Amplitude(int xSamples, int thetaSamples, int kSamples);
+
 
     void setXMinMax(float min, float max) { xMin = min; xMax = max; dXY = (xMax - xMin) / dimXY;};
     void setYMinMax(float min, float max) { yMin = min; yMax = max; dXY = (yMax - yMin) / dimXY;};;
@@ -41,7 +46,15 @@ public:
 
     void timeStep(double dt);
 
+
+
+    float getInterpolatedAmplitudeVal(Vector2f x, Vector2f k); // find the relevant
+
 private:
+
+
+    Grid m_grid;
+
 
     double m_time = 0.0; // accumulate time across timesteps
 
@@ -49,6 +62,7 @@ private:
     int dimXY = 1024;
     int dimTheta = 16;
     int dimK = 1;
+
 
     // simulation domain range
     // double dx, dy; // assuming this same as dXY
@@ -64,7 +78,7 @@ private:
     int numWaveNumberSamples = 1;
     int numThetaSamples = 16;
 
-    vector<double> amplitudeGrid;
+    std::vector<double> amplitudeGrid;
 // TODO: make Grid4d class
     // we don't need two variables
 //    Grid4d currAmplitude;

@@ -1,5 +1,9 @@
 #include "amplitude.h"
 
+
+Amplitude::Amplitude() {
+
+}
 Amplitude::Amplitude(int xSamples, int thetaSamples, int kSamples) : dimXY(xSamples), dimTheta(thetaSamples), dimK(kSamples) {
     amplitudeGrid.resize(this->dimXY * this->dimXY * this->dimTheta * this->dimK);
     m_profileBuffer = ProfileBuffer();
@@ -104,7 +108,7 @@ double Amplitude::interpolateAmplitude(Vector2d idxSpacePos, double theta) {
 void Amplitude::advectionStep(double dt) {
 
     // notes: we don't need a seprate member var for newAmplitudeGrid... eqn 17 suggests using a single amplitudeGrid var to fill in newAmplitudeGrid
-    vector<double> newAmplitudeGrid(amplitudeGrid.size(), 0);
+    std::vector<double> newAmplitudeGrid(amplitudeGrid.size(), 0);
 
     for (int i=0; i<dimXY; ++i) { // a
         for (int j=0; j<dimXY; ++j) { // a

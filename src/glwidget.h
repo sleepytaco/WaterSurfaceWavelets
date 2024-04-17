@@ -45,6 +45,7 @@ private slots:
 
 private:
     Simulation    m_sim;
+
     Camera  m_camera;
     Shader *m_defaultShader;
 
