@@ -3,6 +3,7 @@
 #include "graphics/shape.h"
 #include "Eigen/StdList"
 #include "Eigen/StdVector"
+#include "grid.h"
 
 class Shader;
 
@@ -10,6 +11,7 @@ class Simulation
 {
 private:
     Shape m_shape;
+    Grid m_grid;
 
 public:
     Simulation();

@@ -52,6 +52,8 @@ add_executable(${PROJECT_NAME}
 
     util/tiny_obj_loader.h
     util/unsupportedeigenthing/OpenGLSupport
+    src/diffusion.h src/diffusion.cpp
+    src/grid.h src/grid.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
