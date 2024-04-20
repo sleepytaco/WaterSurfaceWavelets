@@ -158,7 +158,7 @@ double Amplitude::waterHeight(Vector2d pos) {
             double fraction = (double)c / (double)numWaveNumberSamples;
             double wavelength = wavelengthMax * fraction + wavelengthMin * (1 - fraction); // not 100% sure on this
             double waveNumber = 2.0 * M_PI / wavelength;
-            totalHeight += interpolateAmplitude4d(pos, theta, waveNumber)/* * m_profileBuffer.getValueAt(p)*/; // no shot this works first time. check here when things inevitably break
+            totalHeight += interpolateAmplitude(pos, theta)/* * m_profileBuffer.getValueAt(p)*/; // no shot this works first time. check here when things inevitably break
         }
     }
 
