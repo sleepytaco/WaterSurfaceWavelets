@@ -30,6 +30,8 @@ Vector2d Amplitude::idxToPos(int i, int j) {
 Vector2d Amplitude::posToIdxSpace(Vector2d pos) {
     double idxSpaceX = (pos.x() - xMin) / dXY;
     double idxSpaceY = (pos.y() - yMin) / dXY;
+    if (idxSpaceX > dXY) idxSpaceX -= dXY;
+    if (idxSpaceY > dXY) idxSpaceY -= dXY;
     return Vector2d(idxSpaceX, idxSpaceY);
 }
 
@@ -86,6 +88,7 @@ double Amplitude::interpolateAmplitude4d(Vector2d x, double theta, double waveNu
 
     // part that I'm least sure about but I'm not sure what the basis function for wave number is supposed to be besides this
 //    interpolatedAmplitude *= m_profileBuffer.spectrum(m_profileBuffer.dispersion(waveNumber));
+
     return interpolatedAmplitude;
 }
 
