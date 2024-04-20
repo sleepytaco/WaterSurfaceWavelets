@@ -15,5 +15,7 @@ double& Grid::get(Vector2i pos, int theta, int k) {
 }
 
 double& Grid::get(int x, int y, int theta, int k) {
+    x%=dims;
+    y%=dims;
     return amplitudeGrid[gridIndex(x,  y, theta, k)];
 }

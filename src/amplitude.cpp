@@ -98,6 +98,7 @@ double Amplitude::interpolateAmplitude(Vector2d idxSpacePos, int thetaIdx) {
     int i = floor(idxSpacePos[0]);
     int j = floor(idxSpacePos[1]);
 
+
     // obtain relevant values adjacent to idxSpacePos
     double topLeft     = m_currentAmplitude.get(i  , j  , thetaIdx, 0);
     double topRight    = m_currentAmplitude.get(i+1, j  , thetaIdx, 0);
