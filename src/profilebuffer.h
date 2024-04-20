@@ -36,7 +36,7 @@ private:
     constexpr static const double wavelengthMax = 13.0;
     constexpr static const double waveNumberMin = 314.159; // wave number = 2pi/wavelength
     constexpr static const double waveNumberMax = 0.483;
-    constexpr static const double bufferExtent = 100.0;
+    constexpr static const double bufferExtent = 40.0;
     constexpr static const int numSubintervals = 50; // For integration
     constexpr static const double g = 9.81;
     constexpr static const double U = 10.0; // average wind speed

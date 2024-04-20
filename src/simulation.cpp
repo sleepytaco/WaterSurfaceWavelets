@@ -12,8 +12,6 @@ using namespace Eigen;
 Simulation::Simulation()
     : m_amplitude()
 {
-    std::cout << "simulation constructor" << std::endl;
-
     // sample min max simulation ranges from supplemental paper - assuming meters as units
     // these setters internally calculate the grid cell widths dXY, dTheta, dK
     m_amplitude.setXMinMax(0, 4000);

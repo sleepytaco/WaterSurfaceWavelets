@@ -5,6 +5,7 @@
 #include "Eigen/StdList"
 #include "Eigen/StdVector"
 #include "grid.h"
+#include <random>
 
 class Shader;
 
@@ -13,6 +14,10 @@ class Simulation
 private:
     Shape m_shape;
     Amplitude m_amplitude;
+    std::uniform_real_distribution<double> unif;
+    std::default_random_engine re;
+    double lower_bound;
+    double upper_bound;
 
 public:
     Simulation();

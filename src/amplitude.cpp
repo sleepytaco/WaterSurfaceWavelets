@@ -3,8 +3,8 @@
 
 Amplitude::Amplitude() {
     std::cout << "amplitude constructor" << std::endl;
-    double lower_bound = 20;
-    double upper_bound = -20;
+    double lower_bound = 10;
+    double upper_bound = -10;
     std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
     std::default_random_engine re;
 
@@ -13,7 +13,7 @@ Amplitude::Amplitude() {
     for (int i=0; i<dimXY; ++i) { // a
         for (int j=0; j<dimXY; ++j) { // a
             for (int theta=0; theta<dimTheta; ++theta) { // b
-                m_currentAmplitude.get(i, j, theta, 0) = unif(re);
+                m_currentAmplitude.get(i, j, theta, 0) = 0.5 * sin((i + j) / 2);
             }
         }
     }
@@ -63,7 +63,7 @@ double Amplitude::interpolateAmplitude4d(Vector2d x, double theta, double waveNu
         for (int j = idxYMin; j <= idxYMin + 1; j++) {
             for (int k = idxThetaMin; k <= idxThetaMin + 1; k++) {
                 double amplitude = m_currentAmplitude.get(i, j, k, 0);
-                double weight = (Vector3d((double)i, (double)j, (double)k) - Vector3d(idxSpaceX, idxSpaceY, idxSpaceTheta)).norm();
+                double weight = (Vector3d(i, j, k) - Vector3d(idxSpaceX, idxSpaceY, idxSpaceTheta)).norm();
                 amplitudes.push_back(amplitude);
                 weights.push_back(weight);
             }
@@ -154,7 +154,7 @@ double Amplitude::waterHeight(Vector2d pos) {
             double fraction = (double)c / (double)numWaveNumberSamples;
             double wavelength = wavelengthMax * fraction + wavelengthMin * (1 - fraction); // not 100% sure on this
             double waveNumber = 2.0 * M_PI / wavelength;
-            totalHeight += interpolateAmplitude4d(pos, theta, waveNumber) * m_profileBuffer.getValueAt(p); // no shot this works first time. check here when things inevitably break
+            totalHeight += interpolateAmplitude4d(pos, theta, waveNumber)/* * m_profileBuffer.getValueAt(p)*/; // no shot this works first time. check here when things inevitably break
         }
     }
 
