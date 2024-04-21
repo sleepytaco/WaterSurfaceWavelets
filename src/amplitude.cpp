@@ -3,8 +3,8 @@
 
 Amplitude::Amplitude() {
     std::cout << "amplitude constructor" << std::endl;
-    double lower_bound = 30;
-    double upper_bound = -30;
+    double lower_bound = -20;
+    double upper_bound = 20;
     std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
     std::default_random_engine re;
 
@@ -30,8 +30,10 @@ Vector2d Amplitude::idxToPos(int i, int j) {
 Vector2d Amplitude::posToIdxSpace(Vector2d pos) {
     double idxSpaceX = (pos.x() - xMin) / dXY;
     double idxSpaceY = (pos.y() - yMin) / dXY;
-    if (idxSpaceX > dXY) idxSpaceX -= dXY;
-    if (idxSpaceY > dXY) idxSpaceY -= dXY;
+    if (idxSpaceX > dimXY) idxSpaceX -= dimXY;
+    if (idxSpaceY > dimXY) idxSpaceY -= dimXY;
+    if (idxSpaceX < 0) idxSpaceX += dimXY;
+    if (idxSpaceY < 0) idxSpaceY += dimXY;
     return Vector2d(idxSpaceX, idxSpaceY);
 }
 
@@ -158,7 +160,7 @@ double Amplitude::waterHeight(Vector2d pos) {
             double fraction = (double)c / (double)numWaveNumberSamples;
             double wavelength = config.wavelengthMax * fraction + config.wavelengthMin * (1 - fraction); // not 100% sure on this
             double waveNumber = 2.0 * M_PI / wavelength;
-            totalHeight += interpolateAmplitude(pos, theta)* m_profileBuffer.getValueAt(p); // no shot this works first time. check here when things inevitably break
+            totalHeight += interpolateAmplitude(pos, theta) * m_profileBuffer.getValueAt(p); // no shot this works first time. check here when things inevitably break
         }
     }
 
