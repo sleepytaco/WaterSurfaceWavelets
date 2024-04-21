@@ -1,6 +1,7 @@
 #ifndef PROFILEBUFFER_H
 #define PROFILEBUFFER_H
 
+#include "config.h"
 #include <functional>
 #include <array>
 
@@ -31,15 +32,15 @@ private:
     // Pierson-Moskowitz, eq. 20 from https://dl.acm.org/doi/pdf/10.1145/2791261.2791267
 
     // Parameters TODO: move all of these settings to a config file
-    constexpr static const int bufferSize = 4096;
-    constexpr static const double wavelengthMin = 0.02;
-    constexpr static const double wavelengthMax = 13.0;
-    constexpr static const double waveNumberMin = 314.159; // wave number = 2pi/wavelength
-    constexpr static const double waveNumberMax = 0.483;
-    constexpr static const double bufferExtent = 40.0;
-    constexpr static const int numSubintervals = 50; // For integration
-    constexpr static const double g = 9.81;
-    constexpr static const double U = 10.0; // average wind speed
+    constexpr static const int bufferSize = config.bufferSize;
+    constexpr static const double wavelengthMin = config.wavelengthMin;
+    constexpr static const double wavelengthMax = config.wavelengthMax;
+    constexpr static const double waveNumberMin = config.waveNumberMin; // wave number = 2pi/wavelength
+    constexpr static const double waveNumberMax = config.waveNumberMax;
+    constexpr static const double bufferExtent = config.bufferExtent;
+    constexpr static const int numSubintervals = config.numSubintervals; // For integration
+    constexpr static const double g = config.g;
+    constexpr static const double U = config.U; // average wind speed
 
     // Members
     std::array<double, bufferSize> m_buffer;

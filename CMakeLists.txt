@@ -44,6 +44,9 @@ add_executable(${PROJECT_NAME}
     src/profilebuffer.h
     src/profilebuffer.cpp
 
+    src/config.h
+    src/config.cpp
+
     src/mainwindow.h
     src/simulation.h
     src/glwidget.h

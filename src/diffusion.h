@@ -2,10 +2,10 @@
 #define DIFFUSION_H
 
 
-class diffusion
+class Diffusion
 {
 public:
-    diffusion();
+    Diffusion();
 };
 
 #endif // DIFFUSION_H

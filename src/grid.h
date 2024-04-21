@@ -1,6 +1,7 @@
 #ifndef GRID_H
 #define GRID_H
 
+#include "config.h"
 #include "Eigen/Dense"
 #include <iostream>
 #include <unordered_set>
@@ -23,11 +24,10 @@ public:
 
 
 private:
-    size_t dims = 256;
-    size_t theta = 16;
-    size_t k = 1;
-
-    size_t mesh_dims = 128;
+    size_t dims = config.dimXY;
+    size_t theta = config.dimTheta;
+    size_t k = config.dimK;
+//    size_t mesh_dims = 128;
 
     std::vector<double> amplitudeGrid;
 

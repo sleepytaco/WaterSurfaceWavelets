@@ -1,6 +1,6 @@
 #include "diffusion.h"
 
-diffusion::diffusion()
+Diffusion::Diffusion()
 {
 
 }

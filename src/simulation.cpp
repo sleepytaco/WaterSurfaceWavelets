@@ -1,6 +1,6 @@
 #include "simulation.h"
 #include "amplitude.h"
-
+#include "config.h"
 #include <iostream>
 #include <set>
 #include <map>
@@ -14,10 +14,10 @@ Simulation::Simulation()
 {
     // sample min max simulation ranges from supplemental paper - assuming meters as units
     // these setters internally calculate the grid cell widths dXY, dTheta, dK
-    m_amplitude.setXMinMax(0, 4000);
-    m_amplitude.setYMinMax(0, 4000);
-    m_amplitude.setThetaMinMax(0, 2*M_PI); // radians
-    m_amplitude.setKMinMax(2.0*M_PI/0.02, 2.0*M_PI/13.0); // wavenumber (k) = 2pi / wavelength (lamdba)
+//    m_amplitude.setXMinMax(0, 4000);
+//    m_amplitude.setYMinMax(0, 4000);
+//    m_amplitude.setThetaMinMax(0, 2*M_PI); // radians
+//    m_amplitude.setKMinMax(2.0*M_PI/0.02, 2.0*M_PI/13.0); // wavenumber (k) = 2pi / wavelength (lamdba)
 }
 
 void Simulation::update(double deltaTime) {
@@ -39,7 +39,7 @@ void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 {
     std::vector<Vector3f> vertices;
     std::vector<Vector3i> triangles;
-    int size = 128;
+    int size = config.dimXY;
 
     for(int i = 0; i < size; ++i){
         for(int j = 0; j < size; ++j){

@@ -1,7 +1,7 @@
 #include "Eigen/Dense"
 
 #include "grid.h"
-
+#include "config.h"
 #include "profilebuffer.h"
 
 #include <iostream>
@@ -20,10 +20,10 @@ class Amplitude
 public:
     Amplitude();
 
-    void setXMinMax(float min, float max) { xMin = min; xMax = max; dXY = (xMax - xMin) / dimXY;};
-    void setYMinMax(float min, float max) { yMin = min; yMax = max; dXY = (yMax - yMin) / dimXY;};
-    void setThetaMinMax(float min, float max) { thetaMin = min; thetaMax = max; dTheta = (thetaMax - thetaMin) / dimTheta;};
-    void setKMinMax(float min, float max) { kMin = min; kMax = max; dK = (kMin - kMax) / 2;};
+//    void setXMinMax(float min, float max) { xMin = min; xMax = max; dXY = (xMax - xMin) / dimXY;};
+//    void setYMinMax(float min, float max) { yMin = min; yMax = max; dXY = (yMax - yMin) / dimXY;};
+//    void setThetaMinMax(float min, float max) { thetaMin = min; thetaMax = max; dTheta = (thetaMax - thetaMin) / dimTheta;};
+//    void setKMinMax(float min, float max) { kMin = min; kMax = max; dK = (kMin - kMax) / 2;};
 
     Vector2d idxToPos(int i, int j);
     Vector2d posToIdxSpace(Vector2d pos); // returns (a, b) in "index space" eg. a = i + 0.123, b = j = 0.456
@@ -53,24 +53,20 @@ private:
     double m_time = 0.0; // accumulate time across timesteps
 
     // number of samples for 4D amplitude grid
-    const int dimXY = 256;
-    const int dimTheta = 16;
-    const int dimK = 1;
+    const int dimXY = config.dimXY;
+    const int dimTheta = config.dimTheta;
+    const int dimK = config.dimK;
 
+    // number of samples for integrating water height
+    int numWaveNumberSamples = config.numWaveNumberSamples;
+    int numThetaSamples = config.numThetaSamples;
 
     // simulation domain range
     // double dx, dy; // assuming this same as dXY
-    double xMin; double xMax; double dXY; // the "width" of each cell XY grid cell
-    double yMin; double yMax;
-    double thetaMin; double thetaMax;  double dTheta;
-    double kMin; double kMax; double dK;
-
-    double wavelengthMin = 0.02; // note: if these are changed so should the values in profilebuffer.h, these should be moved to a config file
-    double wavelengthMax = 13.0;
-
-    // number of samples for integrating water height
-    int numWaveNumberSamples = 1;
-    int numThetaSamples = 16;
+    double xMin=config.xMin; double xMax=config.xMax; double dXY=config.dXY; // the "width" of each cell XY grid cell
+    double yMin=config.yMin; double yMax=config.yMax;
+    double thetaMin=config.thetaMin; double thetaMax=config.thetaMax;  double dTheta=config.dTheta;
+    double kMin=config.kMin; double kMax=config.kMax; double dK=config.dK;
 
     ProfileBuffer m_profileBuffer;
 };
