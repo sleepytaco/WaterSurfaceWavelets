@@ -32,6 +32,9 @@ public:
 
     // eqn 17 in paper
     double advectionSpeed(double waveNumber);
+
+    double advectionAccel(double waveNumber);
+
     Vector2d advectionPos(Vector2d pos, double dt, double theta, double waveNumber);
     void advectionStep(double dt);
 
@@ -44,6 +47,10 @@ public:
 
     void timeStep(double dt);
 
+    float gamma(double waveNumber, double theta);
+
+    float delta(double waveNumber, double theta);
+
 private:
 
     Grid m_currentAmplitude;
@@ -53,7 +60,7 @@ private:
     double m_time = 0.0; // accumulate time across timesteps
 
     // number of samples for 4D amplitude grid
-    const int dimXY = config.dimXY;
+    const int dimXY = config.bufferSize;
     const int dimTheta = config.dimTheta;
     const int dimK = config.dimK;
 
