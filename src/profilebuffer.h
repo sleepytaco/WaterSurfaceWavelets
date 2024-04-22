@@ -4,8 +4,11 @@
 #include "config.h"
 #include <functional>
 #include <array>
+#include "Eigen/Dense"
 
-#define FUNCTION std::function<double(double)>
+using namespace Eigen;
+
+#define FUNCTION std::function<Vector2d(double)>
 
 class ProfileBuffer
 {
@@ -13,8 +16,7 @@ public:
     ProfileBuffer();
 
     void precompute(double time);
-    double getValueAt(double p);
-    void integrationTest(); // temporary
+    Vector2d getValueAt(double p);
     double dispersion(double waveNumber);
     double spectrum(double omega);
 
@@ -23,7 +25,7 @@ private:
     FUNCTION integrand(double p, double time);
 
     // Simpson's 1/3 rule: https://en.wikipedia.org/wiki/Simpson%27s_rule
-    double integrate(double minBound, double maxBound, FUNCTION& fun);
+    Vector2d integrate(double minBound, double maxBound, FUNCTION& fun);
 
     // See implementation details for explanation
     double h00(double s);
@@ -43,7 +45,7 @@ private:
     constexpr static const double U = config.U; // average wind speed
 
     // Members
-    std::array<double, bufferSize> m_buffer;
+    std::array<Vector2d, bufferSize> m_buffer;
 };
 
 #endif // PROFILEBUFFER_H

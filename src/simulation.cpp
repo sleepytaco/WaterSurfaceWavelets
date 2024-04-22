@@ -26,13 +26,15 @@ void Simulation::update(double deltaTime) {
 }
 
 void Simulation::setWaterHeights() {
-    std::vector<Eigen::Vector3f> new_vertices = m_shape.getVertices();
-    for (int i = 0; i < new_vertices.size(); i++) {
-        Vector3f vertex = new_vertices[i];
+//    std::vector<Eigen::Vector3f> new_vertices = m_shape.getVertices();
+    for (int i = 0; i < undisturbedPoints.size(); i++) {
+        Vector3f vertex = undisturbedPoints[i];
         Vector2d xz = Vector2d(vertex.x(), vertex.z());
-        new_vertices[i].y() = m_amplitude.waterHeight(xz);
+        newPoints[i].x() = vertex.x() + m_amplitude.waterHeight(xz).cast<float>().x();
+        newPoints[i].y() = m_amplitude.waterHeight(xz).cast<float>().z();
+        newPoints[i].z() = vertex.z() + m_amplitude.waterHeight(xz).cast<float>().y();
     }
-    m_shape.setVertices(new_vertices);
+    m_shape.setVertices(newPoints);
 }
 
 void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
@@ -73,4 +75,7 @@ void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     }
     coeffMin = all_vertices.colwise().minCoeff();
     coeffMax = all_vertices.colwise().maxCoeff();
+
+    undisturbedPoints = m_shape.getVertices();
+    newPoints.resize(undisturbedPoints.size());
 }

@@ -18,6 +18,8 @@ private:
     std::default_random_engine re;
     double lower_bound;
     double upper_bound;
+    std::vector<Eigen::Vector3f> undisturbedPoints;
+    std::vector<Eigen::Vector3f> newPoints;
 
 public:
     Simulation();
