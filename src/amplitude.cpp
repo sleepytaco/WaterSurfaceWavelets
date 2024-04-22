@@ -156,23 +156,31 @@ void Amplitude::precomputeProfileBuffers(double time) {
     m_profileBuffer.precompute(time);
 }
 
-double Amplitude::waterHeight(Vector2d pos) {
+Vector3d Amplitude::waterHeight(Vector2d pos) {
+    Vector3d total = Vector3d(0, 0, 0);
     double totalHeight = 0;
 
     for (int b = 1; b <= numThetaSamples; b++) {
         double theta = 2.0 * M_PI * (double)b / (double)numThetaSamples;
         Vector2d waveDirection = Vector2d(cos(theta), sin(theta));
         double p = waveDirection.dot(pos);
+        Vector2d profile = m_profileBuffer.getValueAt(p);
 
         for (int c = 1; c <= numWaveNumberSamples; c++) {
             double fraction = (double)c / (double)numWaveNumberSamples;
             double wavelength = config.wavelengthMax * fraction + config.wavelengthMin * (1 - fraction); // not 100% sure on this
             double waveNumber = 2.0 * M_PI / wavelength;
-            totalHeight += interpolateAmplitude(pos, theta) * m_profileBuffer.getValueAt(p); // no shot this works first time. check here when things inevitably break
+
+            // Gerstner Waves: https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf
+            Vector2d profileXZ = waveDirection * profile.x();
+            Vector3d profilePos = interpolateAmplitude(pos, theta) * Vector3d(profileXZ.x(), profile.y(), profileXZ.y());
+            Vector2d XZScalar = -waveDirection / waveNumber;
+            profilePos = profilePos.cwiseProduct(Vector3d(XZScalar.x(), 1, XZScalar.y()));
+            total += profilePos; // no shot this works first time. check here when things inevitably break
         }
     }
 
-    return totalHeight;
+    return total;
 }
 
 void Amplitude::timeStep(double dt) {

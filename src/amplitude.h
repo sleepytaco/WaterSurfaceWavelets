@@ -43,7 +43,7 @@ public:
 
     void precomputeProfileBuffers(double time);
 
-    double waterHeight(Vector2d pos);
+    Vector3d waterHeight(Vector2d pos);
 
     void timeStep(double dt);
 

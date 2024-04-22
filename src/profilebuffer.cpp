@@ -13,12 +13,12 @@ void ProfileBuffer::precompute(double time) {
     for (int i = 0; i < bufferSize; ++i) {
         double p = (i * bufferExtent) / bufferSize;
         FUNCTION fun = integrand(p, time);
-        double value = integrate(waveNumberMin, waveNumberMax, fun);
+        Vector2d value = integrate(waveNumberMin, waveNumberMax, fun);
         m_buffer[i] = value;
     }
 }
 
-double ProfileBuffer::getValueAt(double p) {
+Vector2d ProfileBuffer::getValueAt(double p) {
     double interpolatePos = p * bufferSize / bufferExtent; // where we want to interpolate
     int prev = (int)floor(interpolatePos);
     int next = prev + 1;
@@ -40,7 +40,7 @@ double ProfileBuffer::spectrum(double omega) {
 }
 
 FUNCTION ProfileBuffer::integrand(double p, double time) {
-    return [this, p, time](double waveNumber) -> double {
+    return [this, p, time](double waveNumber) -> Vector2d {
         double omega = dispersion(waveNumber);
         double waveLength = 2 * M_PI / waveNumber;
         double s = p / bufferExtent;
@@ -48,19 +48,27 @@ FUNCTION ProfileBuffer::integrand(double p, double time) {
         // TODO: the paper doesn't do a good job of differentiating between wavenumber and wavelength, we might have to fiddle with the below math
         double phi = spectrum(omega);
 //        double phi = 1;
-        double part1 = cos(waveNumber * p - omega * time);
-        double part2 = h00(s) * cos(waveNumber * (p + bufferExtent) - omega * time);
-        double part3 = h01(s) * cos(waveNumber * (p - bufferExtent) - omega * time);
+        double weight1 = h00(s);
+        double weight2 = h01(s);
+        double angle1 = waveNumber * p - omega * time;
+        double angle2 = waveNumber * (p + bufferExtent) - omega * time;
+        double angle3 = waveNumber * (p - bufferExtent) - omega * time;
+        double part1X = -sin(angle1);
+        double part2X = weight1 * -sin(angle2);
+        double part3X = weight2 * -sin(angle3);
+        double part1Y = cos(angle1);
+        double part2Y = weight1 * cos(angle2);
+        double part3Y = weight2 * cos(angle3);
 //        std::cout << "evaluated at " << waveNumber << ", p = " << p << std::endl;
-        return 0.5 * phi * waveLength * (part1 + part2 + part3);
+        return 0.5 * phi * waveLength * Vector2d(part1X + part2X + part3X, part1Y + part2Y + part3Y);
     };
 }
 
 
 // Simpson's 1/3 rule: https://en.wikipedia.org/wiki/Simpson%27s_rule
-double ProfileBuffer::integrate(double minBound, double maxBound, FUNCTION& fun) {
+Vector2d ProfileBuffer::integrate(double minBound, double maxBound, FUNCTION& fun) {
     double delta = (maxBound - minBound) / numSubintervals;
-    double integral = 0.0;
+    Vector2d integral = Vector2d(0, 0);
     double x = minBound;
 
     for (int i = 0; i < numSubintervals; ++i) {
@@ -69,15 +77,6 @@ double ProfileBuffer::integrate(double minBound, double maxBound, FUNCTION& fun)
     }
 
     return integral;
-}
-
-void ProfileBuffer::integrationTest() {
-    FUNCTION fun = [&](double x) -> double {
-        return x*x;
-    };
-
-    double result = integrate(4, 0, fun);
-    std::cout << "integral is approximately " << result << std::endl;
 }
 
 double ProfileBuffer::dispersion(double waveNumber) {
