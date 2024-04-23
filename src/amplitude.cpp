@@ -50,7 +50,6 @@ Vector2d Amplitude::posToIdxSpace(Vector2d pos) {
 // assuming deep water dispersion: this is the equation for omega' if omega = sqrt(gk)
 // TODO: this might be too simple and need to factor in additional terms
 double Amplitude::advectionSpeed(double waveNumber) {
-    //return sqrt(9.8) * 0.5 / sqrt(waveNumber);
     double val = config.g/(2 * sqrt(config.g * waveNumber + config.sigma * pow(waveNumber, 3)));
     return val;
 }
@@ -190,7 +189,16 @@ void Amplitude::advectionStep(double dt) {
                 // fill in the newAmplitudeGrid with interpolated amplitude values at (x_jump, y_jump)
                 double A = interpolateAmplitude(idxSpaceAdvPos, theta);
                 double dissapation = 0; //2*1e-6*k_c*k_c*A; // including this term from paper stabalizes the water to a sheet pretty quickly
-                m_newAmplitude.get(i, j, theta, 0) = A - dissapation;
+
+
+                //calulate diffusion here
+
+                double gamma = 0.025 * advectionSpeed(k_c) * pow(dimTheta, 2)/dimXY;
+
+                double prev = m_newAmplitude.get(i, j, (theta - 1)%dimTheta, 0);
+                double next = m_newAmplitude.get(i, j, (theta + 1)%dimTheta, 0);
+                double s_d = (1 - 2 * gamma * dt/pow(dimTheta, 2)) * A + gamma * dt/pow(dimTheta, 2) * (prev + next);
+                m_newAmplitude.get(i, j, theta, 0) = s_d - dissapation;
             }
         }
     }

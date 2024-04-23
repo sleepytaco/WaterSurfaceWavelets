@@ -38,6 +38,9 @@ public:
     Vector2d advectionPos(Vector2d pos, double dt, double theta, double waveNumber);
     void advectionStep(double dt);
 
+
+    void amplitudeSpread(double dt);
+
      // eqn 16 in paper
     double interpolateAmplitude4d(Vector2d x, double theta, double waveNumber);
 
