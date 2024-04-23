@@ -45,13 +45,10 @@ void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 
     for(int i = 0; i < size; ++i){
         for(int j = 0; j < size; ++j){
-            float period = 8 * M_PI * (i)/100.f;
-            //            vertices.push_back(Vector3f(j, 10 * sin(period), i));
             vertices.push_back(Vector3f(j, 0, i));
 
         }
     }
-
     for(int i = 0; i < size - 1; ++i){
         for(int j = 0; j < size - 1; ++j){
             int c1 = i + j * size;

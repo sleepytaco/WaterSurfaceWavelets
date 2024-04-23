@@ -50,7 +50,15 @@ Vector2d Amplitude::posToIdxSpace(Vector2d pos) {
 // assuming deep water dispersion: this is the equation for omega' if omega = sqrt(gk)
 // TODO: this might be too simple and need to factor in additional terms
 double Amplitude::advectionSpeed(double waveNumber) {
-    return sqrt(9.8) * 0.5 / sqrt(waveNumber);
+    //return sqrt(9.8) * 0.5 / sqrt(waveNumber);
+    double val = config.g/(2 * sqrt(config.g * waveNumber + config.sigma * pow(waveNumber, 3)));
+    return val;
+}
+
+double Amplitude::advectionAccel(double waveNumber) {
+    //return sqrt(9.8) * 0.5 / sqrt(waveNumber);
+    double val =-pow(config.g, 2)/(4 * pow(config.g * waveNumber + config.sigma * pow(waveNumber, 3), 1.5));
+    return val;
 }
 
 Vector2d Amplitude::advectionPos(Vector2d pos, double dt, double theta, double waveNumber) {

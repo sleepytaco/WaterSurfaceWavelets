@@ -15,7 +15,9 @@ struct Config {
     const int numThetaSamples = 16;
 
     // number of samples for 4D amplitude grid
-    const int dimXY = 128; // we assume same X and Y samples
+
+    const int dimXY = 64; // we assume same X and Y samples
+
     const int dimTheta = 16;
     const int dimK = 1;
 
@@ -36,7 +38,7 @@ struct Config {
 
 
     // ------- ProfileBuffer.h --------
-    constexpr static const int bufferSize = 4096;
+    constexpr static const int bufferSize = 64;
     constexpr static const double wavelengthMin = 0.02; // defined
     constexpr static const double wavelengthMax = 13.0;
     constexpr static const double waveNumberMin = 314.159; // wave number = 2pi/wavelength
@@ -44,6 +46,7 @@ struct Config {
     constexpr static const double bufferExtent = 40.0;
     constexpr static const int numSubintervals = 50; // For integration
     constexpr static const double g = 9.81;
+    constexpr static const double sigma = 	0.072;
     constexpr static const double U = 10.0; // average wind speed
     // ------------------------------
 
