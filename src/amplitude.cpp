@@ -1,10 +1,12 @@
 #include "amplitude.h"
 #include <random>
 
+void print(auto&& a) {std::cout << a << std::endl;}
+
 Amplitude::Amplitude() {
     std::cout << "amplitude constructor" << std::endl;
-    double lower_bound = -20;
-    double upper_bound = 20;
+    double lower_bound = -30;
+    double upper_bound = 30;
     std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
     std::default_random_engine re;
 
@@ -13,27 +15,35 @@ Amplitude::Amplitude() {
     for (int i=0; i<dimXY; ++i) { // a
         for (int j=0; j<dimXY; ++j) { // a
             for (int theta=0; theta<dimTheta; ++theta) { // b
-                m_currentAmplitude.get(i, j, theta, 0) = unif(re); // 0.5 * sin((i + j) / 2);
+                // uncomment to init a sqaure with 0 amplitude in the center of the grid
+//                Vector2d x_a = idxToPos(i, j); // x_a = (x, y)
+//                if ((x_a.x() >= 500 && x_a.x() <= 3500) && (x_a.y() >= 500 && x_a.y() <= 3500)) {
+//                    //m_currentAmplitude.get(i, j, theta, 0) = unif(re); 20 * sin((i + j) / 1);
+//                    continue;
+//                }
+
+                m_currentAmplitude.get(i, j, theta, 0) = unif(re) * sin((i + j) / 2);
             }
         }
     }
     m_profileBuffer = ProfileBuffer();
 }
 
-// TODO
 Vector2d Amplitude::idxToPos(int i, int j) {
     double x = xMin + i * dXY;
     double y = yMin + j * dXY;
     return Vector2d(x, y);
 }
-// TODO
+
 Vector2d Amplitude::posToIdxSpace(Vector2d pos) {
     double idxSpaceX = (pos.x() - xMin) / dXY;
     double idxSpaceY = (pos.y() - yMin) / dXY;
+
     if (idxSpaceX > dimXY) idxSpaceX -= dimXY;
     if (idxSpaceY > dimXY) idxSpaceY -= dimXY;
     if (idxSpaceX < 0) idxSpaceX += dimXY;
     if (idxSpaceY < 0) idxSpaceY += dimXY;
+
     return Vector2d(idxSpaceX, idxSpaceY);
 }
 
@@ -44,10 +54,42 @@ double Amplitude::advectionSpeed(double waveNumber) {
 }
 
 Vector2d Amplitude::advectionPos(Vector2d pos, double dt, double theta, double waveNumber) {
-    Vector2d waveDirection = Vector2d(cos(theta), sin(theta));
-    return pos - dt * advectionSpeed(waveNumber) * waveDirection;
+    Vector2d waveDirection = Vector2d(cos(theta), sin(theta));    
+    Vector2d advPos = pos - dt * advectionSpeed(waveNumber) * waveDirection; // pos "back in time" ---- x_jump, y_jump
+
+    // boundary condition check - if adv pos leaves the simulation domain
+    if (advPos.x() < xMin || advPos.x() > xMax-dXY || advPos.y() < yMin || advPos.y() > yMax-dXY) {
+
+        //print(advPos.transpose());
+        Vector2d boundaryNormal(0, 0); // figure out the boundary normal based on dist to grid boundaries
+
+        // assuming the grid is made by lines x=0, x=4000, y=0, y=4000
+        double topDist = abs(advPos.y() - yMin);
+        double rightDist = abs(advPos.x() - xMax);
+        double bottomDist = abs(advPos.y() - yMax);
+        double leftDist = abs(advPos.x() - xMin);
+        double minDist = std::min({leftDist, rightDist, topDist, bottomDist});
+
+        if (minDist == topDist) boundaryNormal = Vector2d(0, -1); // top boundary - normal points down
+        else if (minDist == rightDist) boundaryNormal = Vector2d(-1, 0); // right boundary - normal points left
+        else if (minDist == bottomDist) boundaryNormal = Vector2d(0, 1); // bottom boundary - normal points up
+        else if (minDist == leftDist) boundaryNormal = Vector2d(1, 0); // left boundary - normal points right
+
+        // if (boundaryNormal.dot(waveVector) < 0) waveVector = -waveVector;
+        Vector2d k_refl = waveDirection - 2 * (boundaryNormal.dot(waveDirection)) * boundaryNormal;
+
+        Vector2d pos_new = advPos + k_refl;
+        k_refl.normalize();
+        advPos = pos_new - dt * advectionSpeed(waveNumber) * k_refl;
+
+        // assert that the new advection pos is within the sim domain --- it fails tho...
+        // assert(advPos.x() >= xMin && advPos.x() <= xMax && advPos.y() >= yMin && advPos.y() <= yMax);
+    }
+
+    return advPos;
 }
 
+// TODO: potentially fix this to reflect eqn 16 in the paper (one with basis funcs)
 double Amplitude::interpolateAmplitude4d(Vector2d x, double theta, double waveNumber) {
     Vector2d idxSpacePos = posToIdxSpace(x);
     double idxSpaceX = idxSpacePos.x();
@@ -94,12 +136,12 @@ double Amplitude::interpolateAmplitude4d(Vector2d x, double theta, double waveNu
     return interpolatedAmplitude;
 }
 
+// TODO: turn this simple into cubic spatial interpolation instead of the simple adj amplitude samples weighted avg
 double Amplitude::interpolateAmplitude(Vector2d idxSpacePos, int thetaIdx) {
 
     // obtain floor of x and y coordinates
     int i = floor(idxSpacePos[0]);
     int j = floor(idxSpacePos[1]);
-
 
     // obtain relevant values adjacent to idxSpacePos
     double topLeft     = m_currentAmplitude.get(i  , j  , thetaIdx, 0);
@@ -125,18 +167,22 @@ double Amplitude::interpolateAmplitude(Vector2d idxSpacePos, int thetaIdx) {
 
 // advectionStep moves the current amplitudeGrid forward in time
 void Amplitude::advectionStep(double dt) {
+
     #pragma omp parallel for collapse(2)
     for (int i=0; i<dimXY; ++i) { // a
         for (int j=0; j<dimXY; ++j) { // a
             for (int theta=0; theta<dimTheta; ++theta) { // b
                 Vector2d x_a = idxToPos(i, j); // x_a = (x, y)
                 double theta_b = theta*dTheta;
-                double k_c = dK;
-                Vector2d advPos = advectionPos(x_a, dt, theta_b, k_c); // pos "back in time" ---- x_jump, y_jump
+                double k_c = dK; // wave number
+
+                Vector2d advPos = advectionPos(x_a, dt, theta_b, k_c);// pos "back in time" ---- x_jump, y_jump
                 Vector2d idxSpaceAdvPos = posToIdxSpace(advPos);
+
                 // fill in the newAmplitudeGrid with interpolated amplitude values at (x_jump, y_jump)
-                // TODO: turn this simple into cubic spatial interpolation instead of the simple adj amplitude samples weighted avg
-                m_newAmplitude.get(i, j, theta, 0) = interpolateAmplitude(idxSpaceAdvPos, theta);
+                double A = interpolateAmplitude(idxSpaceAdvPos, theta);
+                double dissapation = 0; //2*1e-6*k_c*k_c*A; // including this term from paper stabalizes the water to a sheet pretty quickly
+                m_newAmplitude.get(i, j, theta, 0) = A - dissapation;
             }
         }
     }
@@ -179,4 +225,5 @@ void Amplitude::timeStep(double dt) {
     m_time += dt;
     advectionStep(dt);
     precomputeProfileBuffers(m_time);
+    std::cout << "sim time elapsed: " << m_time << std::endl;
 }
