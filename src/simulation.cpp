@@ -12,14 +12,7 @@ using namespace Eigen;
 
 Simulation::Simulation()
     : m_amplitude()
-{
-    // sample min max simulation ranges from supplemental paper - assuming meters as units
-    // these setters internally calculate the grid cell widths dXY, dTheta, dK
-//    m_amplitude.setXMinMax(0, 4000);
-//    m_amplitude.setYMinMax(0, 4000);
-//    m_amplitude.setThetaMinMax(0, 2*M_PI); // radians
-//    m_amplitude.setKMinMax(2.0*M_PI/0.02, 2.0*M_PI/13.0); // wavenumber (k) = 2pi / wavelength (lamdba)
-}
+{}
 
 void Simulation::update(double deltaTime) {
     for (int i=0; i<m_particleSystems.size(); ++i) { // step each particle system forward
@@ -46,7 +39,7 @@ void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 {
     // drop objects on the water surface mesh
     initFallingParticleSystem("./meshes/cube.obj", Vector3f(config.dimXY/2, 30, config.dimXY/2));
-    initFallingParticleSystem("./meshes/sphere.obj", Vector3f(config.dimXY/4, 30, config.dimXY/4));
+    initFallingParticleSystem("./meshes/cube.obj", Vector3f(config.dimXY/4, 30, config.dimXY/4));
 
     std::vector<Vector3f> vertices;
     std::vector<Vector3i> triangles;
@@ -98,18 +91,18 @@ void Simulation::initFallingParticleSystem(string meshPath, Vector3f startPos) {
 
     if (MeshLoader::loadTriMesh(meshPath, vertices, triangles)) {
         sys = new System(vertices, triangles); // init a new particle system
-        sys->setParticleMass(0.5);
+        sys->setParticleMass(config.objMass);
 
         Shape* fallingShape = new Shape();
         fallingShape->init(vertices, triangles);
 
         Eigen::Affine3f modelMatrix = Eigen::Affine3f::Identity();
-        modelMatrix.scale(Eigen::Vector3f(5, 5, 5)); // need to scale the obj coz the water mesh is way too large
+        modelMatrix.scale(Eigen::Vector3f(config.objUniformScale, config.objUniformScale, config.objUniformScale)); // need to scale the obj coz the water mesh is way too large
         modelMatrix.translation() = Eigen::Vector3f(startPos[0], startPos[1], startPos[2]);
         fallingShape->setModelMatrix(modelMatrix); // y-up axis
 
-        // sys->setGroundShape(m_ground); // TODO: replace with set amplitude function ? or give access to water surface mesh shape for coupling
         sys->setFallingShape(fallingShape); // set the shape this particle system instance is trying to simulate at its core
+        sys->setWaterSurfaceShape(&m_shape); // give the falling shape access to water surface mesh shape for solid-fluid coupling
 
         m_fallingShapes.push_back(fallingShape); // global list of all falling shapes in the scene
         m_particleSystems.push_back(sys); // global list of all particle system instances

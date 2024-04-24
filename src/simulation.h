@@ -13,7 +13,7 @@ class Shader;
 class Simulation
 {
 private:
-    Shape m_shape;
+    Shape m_shape; // this is the water surface mesh (scared to rename this as the ARAP boilerplate relies on this literally everywhere)
     Amplitude m_amplitude;
     std::uniform_real_distribution<double> unif;
     std::default_random_engine re;
@@ -21,6 +21,16 @@ private:
     double upper_bound;
     std::vector<Eigen::Vector3f> undisturbedPoints;
     std::vector<Eigen::Vector3f> newPoints;
+
+
+    // ============== Solid-fluid Coupling related stuff
+    std::vector<Shape*> m_fallingShapes; // global list of all falling objs in the scene
+    std::vector<System*> m_particleSystems; // global list of all particle system instances for falling objs in the scene
+
+    void initFallingParticleSystem(string meshPath, Vector3f startPos); // initializes a falling object in the scene and adds it to the two global lists above
+
+    Solver* solver; // used to integrate the all m_particleSystems states forward in time (contains eulerstep, midpointstep, rk4 integrators)
+    // ===========================================
 
 public:
     Simulation();
@@ -31,16 +41,6 @@ public:
     void setWaterHeights();
     void update(double deltaTime);
 
-    // ============== Solid-fluid Coupling related stuff
-
-    std::vector<Shape*> m_fallingShapes; // global list of all falling objs in the scene
-    std::vector<System*> m_particleSystems; // global list of all particle system instances for falling objs in the scene
-
-    void initFallingParticleSystem(string meshPath, Vector3f startPos); // initializes a falling object in the scene and adds it to the two global lists above
-
-    Solver* solver; // used to integrate the all m_particleSystems states forward in time (contains eulerstep, midpointstep, rk4 integrators)
-
-    // ===========================================
 
     // ================== If You Choose To Modify The Code Below, It's On You
 

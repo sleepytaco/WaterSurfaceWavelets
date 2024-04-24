@@ -40,6 +40,10 @@ public:
     const std::vector<Eigen::Vector3f>& getVertices();
     const std::vector<Eigen::Vector3i>& getFaces();
     const std::unordered_set<int>& getAnchors();
+    Eigen::Matrix4f& getModelMatrix() { return m_modelMatrix;};
+
+    // making an assumption that all shapes are approximated by a sphere
+    Eigen::Vector3f getShapeCentroid() {return shapeCentroid;};
 
 private:
     GLuint m_surfaceVao;
@@ -61,6 +65,9 @@ private:
     int lastSelected = -1;
 
     // Helpers
+    // making an assumption that all shapes are approximated by a sphere
+    Eigen::Vector3f shapeCentroid; // avg of all vertices
+    void updateShapeCentroid(std::vector<Eigen::Vector3f>& verts); // recompute the mean of all vertices and set it to be shapeCentroid
 
     void selectHelper();
     Eigen::Vector3f getNormal(const Eigen::Vector3i& face);

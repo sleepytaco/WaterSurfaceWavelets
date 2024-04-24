@@ -45,6 +45,13 @@ struct Config {
     constexpr static const double U = 10.0; // average wind speed
     // ------------------------------
 
+
+    // -------- Solid-fluid Coupling --------
+    const float objUniformScale = 5; // scaling factor to scale the loaded meshes by
+    const float objMass = 1;
+    const float fluidDensity = 997; // units are kg/m^3 --- this is the density of water
+    // --------------------------------------
+
 };
 
 // The global Config object

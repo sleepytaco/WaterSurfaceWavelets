@@ -77,6 +77,8 @@ void Shape::init(const vector<Vector3f> &vertices, const vector<Vector3i> &trian
     m_blue  = 0.5f + 0.5f * rand() / ((float) RAND_MAX);
     m_green = 0.5f + 0.5f * rand() / ((float) RAND_MAX);
     m_alpha = 1.0f;
+
+    updateShapeCentroid(verts);
 }
 
 void Shape::setVertices(const vector<Vector3f> &vertices)
@@ -96,6 +98,15 @@ void Shape::setVertices(const vector<Vector3f> &vertices)
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * verts.size() * 3, sizeof(float) * normals.size() * 3, static_cast<const void *>(normals.data()));
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (normals.size() * 3)), sizeof(float) * colors.size() * 3, static_cast<const void *>(colors.data()));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    updateShapeCentroid(verts);
+}
+
+void Shape::updateShapeCentroid(std::vector<Eigen::Vector3f>& verts) {
+    for (Eigen::Vector3f& vert : verts) {
+        shapeCentroid += vert;
+    }
+    shapeCentroid = shapeCentroid / (double) verts.size();
 }
 
 // ================== Model Matrix
@@ -268,5 +279,7 @@ void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
             }
         }
     }
+
+    updateShapeCentroid(verts);
 }
 

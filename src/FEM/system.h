@@ -18,13 +18,14 @@ public:
 
     void setTime(double tNew) { t = tNew;};
     void setState(MatrixXf state) { _particleStates = state; };
-    void setParticleMass(double pMass) {particleMass = pMass;};
+    void setParticleMass(double pMass) {particleMass = pMass/numParticles;};
 
     vector<Vector3f> getVertices(); // extracts particle positions from particleStates variable and returns them
 
     // collisions
     void setFallingShapesList(vector<Shape*>& fsArray) {_fallingShapes = fsArray;};
     void setFallingShape(Shape* shape) {fallingShape = shape;};
+    void setWaterSurfaceShape(Shape* shape) {waterSurfaceShape = shape;};
     // void setGroundShape(Shape groundShape) {ground = groundShape;}; // TODO: convert to set water mesh shape
 
 private:
@@ -43,4 +44,12 @@ private:
     vector<Shape*> _fallingShapes; // global list of all (other) falling shapes in-scene -- useful for inter-shape collisions in the future
 
     MatrixXf calculateForces(MatrixXf& currParticleStates);
+
+    Shape* waterSurfaceShape; // get access to water surface mesh
+    void applyBuoyancyForces(int particleId, MatrixXf& currParticleStates, MatrixXf& forceAccumulator); // apply BuoyancyForces induced by water waves on the particle
+    Vector3f calculateBuoyancyForce(MatrixXf& currParticleStates);
+
+    // utils
+    Vector3f getWorldSpacePos(Vector3f pos, Matrix4f modelMat);
+    Vector3f getWorldSpaceDir(Vector3f dir, Matrix4f modelMat);
 };
