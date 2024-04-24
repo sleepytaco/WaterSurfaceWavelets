@@ -5,6 +5,7 @@
 #include <set>
 #include <map>
 #include <vector>
+#include "graphics/meshloader.h"
 
 using namespace std;
 using namespace Eigen;
@@ -21,6 +22,10 @@ Simulation::Simulation()
 }
 
 void Simulation::update(double deltaTime) {
+    for (int i=0; i<m_particleSystems.size(); ++i) { // step each particle system forward
+        solver->RK4(m_particleSystems[i], deltaTime / 2); // use RK4 to integrate the state of the particle system forward in time
+        m_fallingShapes[i]->setVertices(m_particleSystems[i]->getVertices());
+    }
     m_amplitude.timeStep(deltaTime / 2);
     setWaterHeights();
 }
@@ -39,6 +44,10 @@ void Simulation::setWaterHeights() {
 
 void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 {
+    // drop objects on the water surface mesh
+    initFallingParticleSystem("./meshes/cube.obj", Vector3f(config.dimXY/2, 30, config.dimXY/2));
+    initFallingParticleSystem("./meshes/sphere.obj", Vector3f(config.dimXY/4, 30, config.dimXY/4));
+
     std::vector<Vector3f> vertices;
     std::vector<Vector3i> triangles;
     int size = config.dimXY;
@@ -76,3 +85,36 @@ void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     undisturbedPoints = m_shape.getVertices();
     newPoints.resize(undisturbedPoints.size());
 }
+
+// initializes an obj to drop on the water surface mesh
+void Simulation::initFallingParticleSystem(string meshPath, Vector3f startPos) {
+    // meshPath: path to object that you want to drop on the water surface
+    // startPos: the starting point for the object to start falling from
+
+    vector<Vector3f> vertices; // gets filled in by loadTriMesh
+    vector<Vector3i> triangles; // gets filled in by loadTriMesh
+
+    System* sys = nullptr;
+
+    if (MeshLoader::loadTriMesh(meshPath, vertices, triangles)) {
+        sys = new System(vertices, triangles); // init a new particle system
+        sys->setParticleMass(0.5);
+
+        Shape* fallingShape = new Shape();
+        fallingShape->init(vertices, triangles);
+
+        Eigen::Affine3f modelMatrix = Eigen::Affine3f::Identity();
+        modelMatrix.scale(Eigen::Vector3f(5, 5, 5)); // need to scale the obj coz the water mesh is way too large
+        modelMatrix.translation() = Eigen::Vector3f(startPos[0], startPos[1], startPos[2]);
+        fallingShape->setModelMatrix(modelMatrix); // y-up axis
+
+        // sys->setGroundShape(m_ground); // TODO: replace with set amplitude function ? or give access to water surface mesh shape for coupling
+        sys->setFallingShape(fallingShape); // set the shape this particle system instance is trying to simulate at its core
+
+        m_fallingShapes.push_back(fallingShape); // global list of all falling shapes in the scene
+        m_particleSystems.push_back(sys); // global list of all particle system instances
+    } else {
+        assert(!"Fail to load mesh obj for the falling object D:");
+    }
+}
+

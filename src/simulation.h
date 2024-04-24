@@ -6,6 +6,7 @@
 #include "Eigen/StdVector"
 #include "grid.h"
 #include <random>
+#include "FEM/solver.h"
 
 class Shader;
 
@@ -30,6 +31,17 @@ public:
     void setWaterHeights();
     void update(double deltaTime);
 
+    // ============== Solid-fluid Coupling related stuff
+
+    std::vector<Shape*> m_fallingShapes; // global list of all falling objs in the scene
+    std::vector<System*> m_particleSystems; // global list of all particle system instances for falling objs in the scene
+
+    void initFallingParticleSystem(string meshPath, Vector3f startPos); // initializes a falling object in the scene and adds it to the two global lists above
+
+    Solver* solver; // used to integrate the all m_particleSystems states forward in time (contains eulerstep, midpointstep, rk4 integrators)
+
+    // ===========================================
+
     // ================== If You Choose To Modify The Code Below, It's On You
 
     int getClosestVertex(Eigen::Vector3f start, Eigen::Vector3f ray, float threshold)
@@ -39,7 +51,10 @@ public:
 
     void draw(Shader *shader, GLenum mode)
     {
-        m_shape.draw(shader, mode);
+        m_shape.draw(shader, mode); // water surface mesh
+        for (int i=0; i<m_fallingShapes.size(); ++i) { // draw all the objs thrown on the water surface mesh
+            m_fallingShapes[i]->draw(shader, mode);
+        }
     }
 
     SelectMode select(Shader *shader, int vertex)
