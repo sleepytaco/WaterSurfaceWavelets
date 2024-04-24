@@ -36,8 +36,12 @@ public:
     double advectionAccel(double waveNumber);
 
     Vector2d advectionPos(Vector2d pos, double dt, double theta, double waveNumber);
+
+    void boundaryReflection(Vector2d& advPos, int& thetaIdx);
+
     void advectionStep(double dt);
 
+    double diffusionStep(double dt, Vector2d idxSpaceAdvPos, int xIdx, int yIdx, int thetaIdx, double waveNumber);
 
     void amplitudeSpread(double dt);
 
