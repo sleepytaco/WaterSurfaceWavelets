@@ -117,8 +117,8 @@ Vector2d Amplitude::advectionPos(Vector2d pos, double dt, double theta, double w
 void Amplitude::advectionStep(double dt) {
 
     #pragma omp parallel for collapse(2)
-    for (int i=0; i<dimXY; ++i) { // a
-        for (int j=0; j<dimXY; ++j) { // a
+    for (int i=0; i<config.bufferSize; ++i) { // a
+        for (int j=0; j<config.bufferSize; ++j) { // a
             for (int theta=0; theta<dimTheta; ++theta) { // b
                 Vector2d x_a = idxToPos(i, j); // x_a = (x, y)
                 double theta_b = theta*dTheta;
