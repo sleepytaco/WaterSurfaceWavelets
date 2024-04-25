@@ -2,7 +2,7 @@
 #include "iostream"
 #include "graphics/shape.h"
 #include <unordered_set>
-
+#include "amplitude.h"
 
 using namespace Eigen;
 
@@ -25,7 +25,8 @@ public:
     void setFallingShapesList(std::vector<Shape*>& fsArray) {_fallingShapes = fsArray;};
     void setFallingShape(Shape* shape) {fallingShape = shape;};
     void setWaterSurfaceShape(Shape* shape) {waterSurfaceShape = shape;};
-    // void setGroundShape(Shape groundShape) {ground = groundShape;}; // TODO: convert to set water mesh shape
+
+    void setAmplitudeFunction(Amplitude* amp) { _amplitude4d = amp;};
 
 private:
     const int particleStateDim = 6; // dim of an individual particle (position3f + velocity3f)
@@ -45,6 +46,8 @@ private:
     MatrixXf calculateForces(MatrixXf& currParticleStates);
 
     Shape* waterSurfaceShape; // get access to water surface mesh
+    Amplitude* _amplitude4d;
+
     void applyBuoyancyForces(int particleId, MatrixXf& currParticleStates, MatrixXf& forceAccumulator); // apply BuoyancyForces induced by water waves on the particle
     Vector3f calculateBuoyancyForce(MatrixXf& currParticleStates);
 
