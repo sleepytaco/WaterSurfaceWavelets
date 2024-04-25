@@ -5,8 +5,8 @@ void print(auto&& a) {std::cout << a << std::endl;}
 
 Amplitude::Amplitude() {
     std::cout << "amplitude constructor" << std::endl;
-    double lower_bound = -2;
-    double upper_bound = 2;
+    double lower_bound = -100;
+    double upper_bound = 100;
     std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
     std::default_random_engine re;
 
@@ -22,7 +22,7 @@ Amplitude::Amplitude() {
 //                    continue;
 //                }
 
-                m_currentAmplitude.get(i, j, theta, 0) = unif(re) * sin((i + j) / 2);
+                m_currentAmplitude.get(i, j, theta, 0) = unif(re);1 * sin((i + j) / 2);
             }
         }
     }
@@ -117,8 +117,8 @@ Vector2d Amplitude::advectionPos(Vector2d pos, double dt, double theta, double w
 void Amplitude::advectionStep(double dt) {
 
     #pragma omp parallel for collapse(2)
-    for (int i=0; i<config.bufferSize; ++i) { // a
-        for (int j=0; j<config.bufferSize; ++j) { // a
+    for (int i=0; i<config.dimXY; ++i) { // a
+        for (int j=0; j<config.dimXY; ++j) { // a
             for (int theta=0; theta<dimTheta; ++theta) { // b
                 Vector2d x_a = idxToPos(i, j); // x_a = (x, y)
                 double theta_b = theta*dTheta;
@@ -165,9 +165,13 @@ Vector3d Amplitude::waterHeight(Vector2d pos) {
         Vector2d profile = m_profileBuffer.getValueAt(p);
 
         for (int c = 1; c <= numWaveNumberSamples; c++) {
-            double fraction = (double)c / (double)numWaveNumberSamples;
-            double wavelength = config.wavelengthMax * fraction + config.wavelengthMin * (1 - fraction); // not 100% sure on this
-            double waveNumber = 2.0 * M_PI / wavelength;
+
+//            double fraction = (double)c / (double)numWaveNumberSamples;
+//            double wavelength = config.wavelengthMax * fraction + config.wavelengthMin * (1 - fraction); // not 100% sure on this
+//            double waveNumber = 2.0 * M_PI / wavelength;
+
+            double dWavelength = (config.wavelengthMax - config.wavelengthMin) / numWaveNumberSamples;
+            double waveNumber = c * dWavelength;
 
             // Gerstner Waves: https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf
             Vector2d profileXZ = waveDirection * profile.x();

@@ -77,6 +77,8 @@ double Amplitude::interpolateAmplitude(Vector2d idxSpacePos, int thetaIdx) {
 }
 
 double Amplitude::bilerp(Vector2d x, double theta, double waveNumber){
+
+    return interpolateAmplitude(x, theta);
     // obtain floor of x and y coordinates
     int i = floor(x[0]);
     int j = floor(x[1]);
