@@ -65,6 +65,7 @@ add_executable(${PROJECT_NAME}
     util/unsupportedeigenthing/OpenGLSupport
     src/diffusion.h src/diffusion.cpp
     src/grid.h src/grid.cpp
+    src/interpolation.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`

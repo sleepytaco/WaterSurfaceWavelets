@@ -27,7 +27,7 @@ private:
     std::vector<Shape*> m_fallingShapes; // global list of all falling objs in the scene
     std::vector<System*> m_particleSystems; // global list of all particle system instances for falling objs in the scene
 
-    void initFallingParticleSystem(string meshPath, Vector3f startPos); // initializes a falling object in the scene and adds it to the two global lists above
+    void initFallingParticleSystem(std::string meshPath, Vector3f startPos); // initializes a falling object in the scene and adds it to the two global lists above
 
     Solver* solver; // used to integrate the all m_particleSystems states forward in time (contains eulerstep, midpointstep, rk4 integrators)
     // ===========================================

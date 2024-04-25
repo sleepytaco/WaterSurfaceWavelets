@@ -5,12 +5,11 @@
 
 
 using namespace Eigen;
-using namespace std;
 
 class System {
 public:
     System();
-    System(vector<Vector3f>& vertices, vector<Vector3i>& faces);
+    System(std::vector<Vector3f>& vertices, std::vector<Vector3i>& faces);
 
     double getTime() {return t;};
     MatrixXf getState() { return _particleStates; };
@@ -20,10 +19,10 @@ public:
     void setState(MatrixXf state) { _particleStates = state; };
     void setParticleMass(double pMass) {particleMass = pMass/numParticles;};
 
-    vector<Vector3f> getVertices(); // extracts particle positions from particleStates variable and returns them
+    std::vector<Vector3f> getVertices(); // extracts particle positions from particleStates variable and returns them
 
     // collisions
-    void setFallingShapesList(vector<Shape*>& fsArray) {_fallingShapes = fsArray;};
+    void setFallingShapesList(std::vector<Shape*>& fsArray) {_fallingShapes = fsArray;};
     void setFallingShape(Shape* shape) {fallingShape = shape;};
     void setWaterSurfaceShape(Shape* shape) {waterSurfaceShape = shape;};
     // void setGroundShape(Shape groundShape) {ground = groundShape;}; // TODO: convert to set water mesh shape
@@ -38,10 +37,10 @@ private:
     double particleMass; // assuming all particles share the mass
     MatrixXf _particleStates; // will have size (6 x numparticles) where 6 is state dim
     MatrixXf _particleForces; // will have size (3 x numparticles) -- this matrix hold force accumultor for each particle
-    vector<Vector3i> _faces;
+    std::vector<Vector3i> _faces;
 
     Shape* fallingShape; // this is the core object/shape whose state is being simulated by the system
-    vector<Shape*> _fallingShapes; // global list of all (other) falling shapes in-scene -- useful for inter-shape collisions in the future
+    std::vector<Shape*> _fallingShapes; // global list of all (other) falling shapes in-scene -- useful for inter-shape collisions in the future
 
     MatrixXf calculateForces(MatrixXf& currParticleStates);
 

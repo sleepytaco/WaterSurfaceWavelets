@@ -5,7 +5,7 @@ System::System() {
 
 }
 
-System::System(vector<Vector3f>& vertices, vector<Vector3i>& faces) {
+System::System(std::vector<Vector3f>& vertices, std::vector<Vector3i>& faces) {
 
     numParticles = vertices.size();
     _particleStates = MatrixXf(6, numParticles); // stores matrial space pos and velocity
@@ -104,13 +104,13 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
     for (int i=1; i<numParticles; ++i) {
         particlePosMatSpace = currParticleStates.col(i).head(3); // retrieve the relevant particle position from state
         particlePos = getWorldSpacePos(particlePosMatSpace, fallingShape->getModelMatrix()); // particle pos in world space
-        smallestShapeY = min(smallestShapeY, particlePos.y());
+        smallestShapeY = std::min(smallestShapeY, particlePos.y());
     }
 
     // get largest/highest y-coord of all the vertices in the water surface mesh
     float largestWaterSurfaceY = waterSurfaceShape->getVertices()[0].y();
     for (const Vector3f& v : waterSurfaceShape->getVertices()) {
-        largestWaterSurfaceY = max(largestWaterSurfaceY, v.y());
+        largestWaterSurfaceY = std::max(largestWaterSurfaceY, v.y());
     }
 
     if (smallestShapeY - largestWaterSurfaceY > -shapeRadius/4) { // this means the entirity of the shape is above the water surface
@@ -130,8 +130,8 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
     return buoyancyForce;
 }
 
-vector<Vector3f> System::getVertices() {
-    vector<Vector3f> vertices;
+std::vector<Vector3f> System::getVertices() {
+    std::vector<Vector3f> vertices;
     for (int i=0; i<numParticles; ++i) {
         Vector3f state = _particleStates.col(i).head(3); // get the first 3 components from particle state which contains (pos3d, vel3d)
         vertices.push_back(state);

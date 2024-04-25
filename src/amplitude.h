@@ -63,6 +63,7 @@ private:
     Grid m_currentAmplitude;
     Grid m_newAmplitude;
 
+    double bilerp(Vector2d x, double theta, double waveNumber);
 
     double m_time = 0.0; // accumulate time across timesteps
 
