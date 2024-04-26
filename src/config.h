@@ -6,6 +6,8 @@
 
 #pragma once
 
+void print(auto&& a) {std::cout << a << std::endl;}
+
 struct Config {
 
     // ------ Amplitude.h ----------
