@@ -24,7 +24,7 @@ public:
 
 
 private:
-    size_t dims = config.bufferSize;
+    size_t dims = config.dimXY;
     size_t theta = config.dimTheta;
     size_t k = config.dimK;
 //    size_t mesh_dims = 128;

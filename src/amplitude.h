@@ -58,17 +58,18 @@ public:
 
     float delta(double waveNumber, double theta);
 
-private:
-
     Grid m_currentAmplitude;
     Grid m_newAmplitude;
+
+private:
+
 
     double bilerp(Vector2d x, double theta, double waveNumber);
 
     double m_time = 0.0; // accumulate time across timesteps
 
     // number of samples for 4D amplitude grid
-    const int dimXY = config.bufferSize;
+    const int dimXY = config.dimXY;
     const int dimTheta = config.dimTheta;
     const int dimK = config.dimK;
 

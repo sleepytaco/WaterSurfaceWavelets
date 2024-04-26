@@ -59,7 +59,7 @@ MatrixXf System::calculateForces(MatrixXf& currParticleStates) {
 
         // add viscous drag too maybe ???
         Vector3f particleVelocity = currParticleStates.col(i).tail(3); // get the last 3 components from particle state which contains (pos3d, vel3d)
-        double kd = 0.1; // 1/4e4;
+        double kd = 0.05; // 1/4e4;
         // Vector3d a = particleAcc.col(i);
         forceAccumulator.col(i) -= kd * particleVelocity;// * particleMass; // force prop to opp direction of particle's velocity it is moving in
 
@@ -113,7 +113,7 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
         largestWaterSurfaceY = std::max(largestWaterSurfaceY, v.y());
     }
 
-    if (smallestShapeY - largestWaterSurfaceY > -shapeRadius/4) { // this means the entirity of the shape is above the water surface
+    if (smallestShapeY - largestWaterSurfaceY > 0) { // this means the entirity of the shape is above the water surface
         return buoyancyForce; // return 0 force
     }
 
@@ -125,7 +125,36 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
 //    buoyancyForce = -1 * rho * V * _g;
 
     // naive way
-     buoyancyForce = Vector3f(0, 1, 0); // * (largestWaterSurfaceY - smallestShapeY);
+     buoyancyForce = Vector3f(0, (largestWaterSurfaceY - smallestShapeY), 0); // * (largestWaterSurfaceY - smallestShapeY);
+     Vector2d xz(0, 0);
+     for (const Vector3f& v : waterSurfaceShape->getVertices()) {
+         if (std::abs(smallestShapeY - v.y()) < buoyancyForce[1]) {
+             buoyancyForce[1] = std::abs(smallestShapeY - v.y());
+             xz = Vector2d(v.x(), v.z()); // store the vertex in xz
+         }
+     }
+
+    // xz is meant to be the closest vertex to the cube's smallest y coord
+    // it should approximatelty locate the cube on the grid
+    Vector2d x_a = xz;// x_a = (x, y)
+
+    // TODO: getting i, j this way does not seem to work... bug in posToIdxSpace? hardcoded i, j below
+//     Vector2d idxSpacePos = _amplitude4d->posToIdxSpace(x_a);
+//     double idxSpaceX = idxSpacePos.x();
+//     double idxSpaceY = idxSpacePos.y();
+//     int i = floor(idxSpaceX);
+//     int j = floor(idxSpaceY);
+
+     // hard code location i, j for now (this is a single cube's drop location)
+     int i = config.dimXY/2; // std::floor(x_a.x());
+     int j = config.dimXY/2; // std::floor(x_a.y());
+
+     // my attempt at "distributing" amplitude among all thetas at a grid location i, j
+     // assuming initial amplitude condition of 0
+     for (int theta=0; theta<=config.dimTheta; ++theta) { // b
+          _amplitude4d->m_currentAmplitude.get(i, j, theta, 0) = -5;
+     }
+
 
     return buoyancyForce;
 }

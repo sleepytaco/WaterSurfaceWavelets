@@ -4,8 +4,8 @@
 
 Amplitude::Amplitude() {
     std::cout << "amplitude constructor" << std::endl;
-    double lower_bound = -40;
-    double upper_bound = 40;
+    double lower_bound = -10;
+    double upper_bound = 10;
     std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
     std::default_random_engine re;
 
@@ -21,7 +21,7 @@ Amplitude::Amplitude() {
 //                    continue;
 //                }
 
-                m_currentAmplitude.get(i, j, theta, 0) = unif(re) * sin((i + j) / 2);
+                m_currentAmplitude.get(i, j, theta, 0) = 0; unif(re) * sin((i + j) / 2);
             }
         }
     }
@@ -189,5 +189,4 @@ void Amplitude::timeStep(double dt) {
     advectionStep(dt);
     precomputeProfileBuffers(m_time);
     print("sim time elapsed: " + std::to_string(m_time));
-//    std::cout << "sim time elapsed: " << m_time << std::endl;
 }
