@@ -41,7 +41,11 @@ public:
 
     void advectionStep(double dt);
 
-    double diffusionStep(double dt, Vector2d idxSpaceAdvPos, int xIdx, int yIdx, int thetaIdx, double waveNumber);
+    double spacialDiffusion(double dt, Vector2d idx, int xIdx, int yIdx, int thetaIdx, double waveNumber);
+
+    double diffusionStep(double dt, Vector2d idx, int xIdx, int yIdx, int thetaIdx, double waveNumber);
+
+    double catmullRom(std::vector<Vector2d>& segments, double adv_t);
 
     void amplitudeSpread(double dt);
 

@@ -14,7 +14,7 @@ struct Config {
     const int numThetaSamples = 16;
 
     // number of samples for 4D amplitude grid
-    const int dimXY = 128; // we assume same X and Y samples
+    const int dimXY = 64; // we assume same X and Y samples
     const int dimTheta = 16;
     const int dimK = 1;
 
@@ -33,7 +33,7 @@ struct Config {
 
 
     // ------- ProfileBuffer.h --------
-    constexpr static const int bufferSize = 128;
+    constexpr static const int bufferSize = 64;
     constexpr static const double wavelengthMin = 0.02; // defined
     constexpr static const double wavelengthMax = 13.0;
     constexpr static const double waveNumberMin = 314.159; // wave number = 2pi/wavelength

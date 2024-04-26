@@ -60,21 +60,21 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
     // TODO: maybe also apply boudnary conditions if water is hitting terrain
     Vector2d boundaryNormal = Vector2d(0, 0);
     double boundaryDistance = 0;
-    if (advPos.x() < xMin + dXY) {
+    if (advPos.x() < xMin) {
         boundaryNormal = Vector2d(1, 0);
-        boundaryDistance = abs(advPos.x() - xMin - dXY);
+        boundaryDistance = abs(advPos.x() - xMin);
     }
-    else if (advPos.x() > xMax - dXY) {
+    else if (advPos.x() > xMax) {
         boundaryNormal = Vector2d(-1, 0);
-        boundaryDistance = abs(advPos.x() - xMax + dXY);
+        boundaryDistance = abs(advPos.x() - xMax);
     }
-    else if (advPos.y() < yMin + dXY) {
+    else if (advPos.y() < yMin) {
         boundaryNormal = Vector2d(0, 1);
-        boundaryDistance = abs(advPos.y() - yMin - dXY);
+        boundaryDistance = abs(advPos.y() - yMin);
     }
-    else if (advPos.y() > yMax - dXY) {
+    else if (advPos.y() > yMax) {
         boundaryNormal = Vector2d(0, -1);
-        boundaryDistance = abs(advPos.y() - yMax + dXY);
+        boundaryDistance = abs(advPos.y() - yMax);
     }
     else {
         return;
@@ -117,19 +117,12 @@ Vector2d Amplitude::advectionPos(Vector2d pos, double dt, double theta, double w
 void Amplitude::advectionStep(double dt) {
 
     #pragma omp parallel for collapse(2)
-    for (int i=0; i<config.bufferSize; ++i) { // a
-        for (int j=0; j<config.bufferSize; ++j) { // a
+    for (int i=0; i<dimXY; ++i) { // a
+        for (int j=0; j<dimXY; ++j) { // a
             for (int theta=0; theta<dimTheta; ++theta) { // b
                 Vector2d x_a = idxToPos(i, j); // x_a = (x, y)
-                double theta_b = theta*dTheta;
                 double k_c = dK; // wave number
-
-                Vector2d advPos = advectionPos(x_a, dt, theta_b, k_c);// pos "back in time" ---- x_jump, y_jump
-                int theta_refl = theta;
-                boundaryReflection(advPos, theta_refl);
-                Vector2d idxSpaceAdvPos = posToIdxSpace(advPos);
-
-                double A = diffusionStep(dt, idxSpaceAdvPos, i, j, theta_refl, k_c);
+                double A = spacialDiffusion(dt, x_a, i, j, theta, k_c);
                 m_newAmplitude.get(i, j, theta, 0) = A;
             }
         }
@@ -137,13 +130,54 @@ void Amplitude::advectionStep(double dt) {
     std::swap(m_newAmplitude, m_currentAmplitude);
 }
 
-double Amplitude::diffusionStep(double dt, Vector2d idxSpaceAdvPos, int xIdx, int yIdx, int thetaIdx, double waveNumber) {
+double Amplitude::spacialDiffusion(double dt, Vector2d idxPos, int xIdx, int yIdx, int thetaIdx, double waveNumber){
+    Vector2d p_0 = idxPos;
+    double delta = 0.00001 * pow(dXY, 2) * pow(dK, 2) * fabs(advectionAccel(dK));
+
+    double theta_d = thetaIdx*dTheta;
+
+    Vector2d advPos = advectionPos(idxPos, dt, theta_d, dK);
+    int theta_refl = thetaIdx;
+    boundaryReflection(advPos, thetaIdx);
+
+    double ref_d = theta_refl * dTheta;
+    Vector2d d = Vector2d(cos(ref_d), sin(ref_d));
+
+    Vector2d p_n1 = idxPos + dXY * d;
+    Vector2d p_n2 = idxPos + dXY * d * 2;
+    Vector2d p_p1 = idxPos - dXY * d;
+    Vector2d p_p2 = idxPos - dXY * d * 2;
+    Vector2d p_p3 = idxPos - dXY * d * 3;
+
+    std::vector<Vector2d> p{p_n2, p_n1, p_0, p_p1, p_p2, p_p3};
+    std::vector<double> v;
+    std::vector<Vector2d> nv;
+    #pragma omp parallel
+    for(int i = 0; i < p.size(); ++i){
+        v.push_back(bilerp(p[i], theta_refl, waveNumber));
+    }
+
+    for(int i = 1; i < v.size() - 1; ++i){
+        double diffused = (1 - 2 * delta * dt/pow(dXY, 2)) * v[i] + delta * dt/pow(dXY, 2) * (v[i - 1] + v[i + 1]);
+        Vector2d idx_diff = Vector2d(i, diffused);
+        nv.push_back(idx_diff);
+    }
+
+    double adv_t = (advPos - p_0).norm()/dXY;
+    double spatial_diffuse = catmullRom(nv, adv_t);
+    return spatial_diffuse;
+}
+
+double Amplitude::diffusionStep(double dt, Vector2d idxPos, int xIdx, int yIdx, int thetaIdx, double waveNumber) {
     // fill in the newAmplitudeGrid with interpolated amplitude values at (x_jump, y_jump)
-    double A = bilerp(idxSpaceAdvPos, thetaIdx, waveNumber);
+    double gamma = 0.025 * advectionSpeed(waveNumber) * pow(dTheta, 2)/dimXY;
+
+
+    double A = bilerp(idxPos, thetaIdx, waveNumber);
 
     //calulate diffusion here
     double dissapation = 0; //2*1e-6*k_c*k_c*A; // including this term from paper stabalizes the water to a sheet pretty quickly
-    double gamma = 0.025 * advectionSpeed(waveNumber) * pow(dTheta, 2)/dimXY;
+
     double prev = m_currentAmplitude.get(xIdx, yIdx, (thetaIdx - 1)%dimTheta, 0);
     double next = m_currentAmplitude.get(xIdx, yIdx, (thetaIdx + 1)%dimTheta, 0);
     double s_d = (1 - 2 * gamma * dt/pow(dTheta, 2)) * A + gamma * dt/pow(dTheta, 2) * (prev + next);
