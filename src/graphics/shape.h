@@ -30,6 +30,7 @@ public:
     void setVertices(const std::vector<Eigen::Vector3f> &vertices);
 
     void setModelMatrix(const Eigen::Affine3f &model);
+    void setupSkybox();
 
     void draw(Shader *shader, GLenum mode);
     SelectMode select(Shader *shader, int vertex);

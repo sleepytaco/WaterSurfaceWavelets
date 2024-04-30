@@ -188,5 +188,5 @@ void Amplitude::timeStep(double dt) {
     m_time += dt;
     advectionStep(dt);
     precomputeProfileBuffers(m_time);
-    print("sim time elapsed: " + std::to_string(m_time));
+//    print("sim time elapsed: " + std::to_string(m_time));
 }

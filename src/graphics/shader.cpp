@@ -284,3 +284,7 @@ std::string Shader::getFileContents(std::string path)
     return "";
 }
 
+GLuint Shader::getGLuint() {
+    return m_programID;
+}
+

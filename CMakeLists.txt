@@ -66,11 +66,15 @@ add_executable(${PROJECT_NAME}
     src/diffusion.h src/diffusion.cpp
     src/grid.h src/grid.cpp
     src/interpolation.cpp
+    src/graphics/stb_image.h
+
+
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
 add_library(StaticGLEW STATIC glew/src/glew.c
-    src/profilebuffer.h src/profilebuffer.cpp)
+    src/profilebuffer.h src/profilebuffer.cpp
+)
 include_directories(${PROJECT_NAME} PRIVATE glew/include)
 
 # Specifies libraries to be linked (Qt components, glew, etc)
@@ -97,9 +101,12 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
     FILES
         resources/shaders/shader.frag
         resources/shaders/shader.vert
+        resources/shaders/skybox.frag
+        resources/shaders/skybox.vert
+)
 
-
-
+target_sources(WaterSurfaceWavelets_other_files
+  PRIVATE
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

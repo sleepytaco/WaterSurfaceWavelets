@@ -1,5 +1,7 @@
 #include "glwidget.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "graphics/stb_image.h"
 #include <QApplication>
 #include <QKeyEvent>
 #include <iostream>
@@ -70,7 +72,10 @@ void GLWidget::initializeGL()
     glCullFace(GL_BACK);
 
     // Initialize shaders
-    m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");
+    m_defaultShader = new Shader(":resources/shaders/shader.vert", ":resources/shaders/shader.frag");
+    m_skybox_shader = new Shader(":resources/shaders/skybox.vert", ":resources/shaders/skybox.frag"); // loads and compiles shaders
+
+    setupSkybox();
 
     // Initialize ARAP, and get parameters needed to decide the camera position, etc
     Vector3f coeffMin, coeffMax;
@@ -99,9 +104,101 @@ void GLWidget::initializeGL()
     m_intervalTimer.start(1000 / 60);
 }
 
+void GLWidget::setupSkybox() {
+
+    print("hello");
+
+    // from https://learnopengl.com/Advanced-OpenGL/Cubemaps
+    std::vector<std::string> textures_faces = {
+        "skybox/right.jpg",
+        "skybox/left.jpg",
+        "skybox/top.jpg",
+        "skybox/bottom.jpg",
+        "skybox/front.jpg",
+        "skybox/back.jpg"
+    };
+
+    glGenTextures(1, &skyboxTexture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+
+    // from https://learnopengl.com/Advanced-OpenGL/Cubemaps
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    // from https://learnopengl.com/Advanced-OpenGL/Cubemaps
+    for (unsigned int i = 0; i < 6; i++) {
+        int width, height, nrChannels;
+        unsigned char *data = stbi_load(textures_faces[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data) {
+            // std::cout<<GL_TEXTURE_CUBE_MAP_POSITIVE_X + i<<std::endl;
+            stbi_set_flip_vertically_on_load(false);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+        } else {
+            std::cout << "Cubemap texture failed to load at path: " << textures_faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+
+    //    std::cout<<GL_TEXTURE_CUBE_MAP_POSITIVE_X<<std::endl;
+    //    std::cout<<GL_TEXTURE_CUBE_MAP_NEGATIVE_X<<std::endl;
+    //    std::cout<<GL_TEXTURE_CUBE_MAP_POSITIVE_Y<<std::endl;
+    //    std::cout<<GL_TEXTURE_CUBE_MAP_NEGATIVE_Y<<std::endl;
+    //    std::cout<<GL_TEXTURE_CUBE_MAP_POSITIVE_Z<<std::endl;
+    //    std::cout<<GL_TEXTURE_CUBE_MAP_NEGATIVE_Z<<std::endl;
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    GLfloat skyboxVertices[] = {
+
+        1.f, 1.f, 1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f, -1.f,  1.f, -1.f, 1.f, 1.f, 1.f, 1.f, 1.f,
+        -1.f, 1.f, -1.f, -1.f, -1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f, -1.f, 1.f, 1.f, -1.f, -1.f, 1.f, -1.f,
+        1.f, 1.f, 1.f, -1.f, 1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f, 1.f, 1.f, -1.f, 1.f, 1.f, 1.f,
+        -1.f, -1.f, 1.f, 1.f, -1.f, 1.f, -1.f, -1.f, -1.f, -1.f, -1.f, -1.f, 1.f, -1.f, 1.f, 1.f, -1.f, -1.f,
+        -1.f, 1.f, 1.f, -1.f, -1.f, 1.f, -1.f, -1.f, -1.f, -1.f, -1.f, -1.f, -1.f, 1.f, -1.f, -1.f, 1.f, 1.f,
+        1.f, 1.f, 1.f, 1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f, 1.f, 1.f, 1.f, 1.f
+
+    };
+
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, 108 * sizeof(GLfloat), &skyboxVertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0); // unbinds the buffer
+    glBindVertexArray(0); // unbinds the vao
+}
+
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glDepthMask(GL_FALSE);
+    glUseProgram(m_skybox_shader->getGLuint());
+
+    glUniform1i(glGetUniformLocation(m_skybox_shader->getGLuint(), "u_skybox"), 0);
+
+    Eigen::Matrix4f tempMatrix = Eigen::Matrix4f::Identity();
+    tempMatrix.block<3,3>(0,0) = m_camera.getView().block<3,3>(0,0);
+
+    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader->getGLuint(), "u_viewMatrix"), 1, GL_FALSE, tempMatrix.data());
+    //    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader->getGLuint(), "u_viewMatrix"), 1, GL_FALSE, &glm::mat4(glm::mat3(m_view))[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader->getGLuint(), "u_projectionMatrix"), 1, GL_FALSE, m_camera.getProjection().data());
+    //    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader->getGLuint(), "u_projectionMatrix"), 1, GL_FALSE, &m_proj[0][0]);
+
+    glBindVertexArray(skyboxVAO);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDepthMask(GL_TRUE);
 
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());
@@ -125,10 +222,10 @@ void GLWidget::resizeGL(int w, int h)
 Eigen::Vector3f GLWidget::transformToWorldRay(int x, int y)
 {
     Eigen::Vector4f clipCoords = Eigen::Vector4f(
-                (float(x) / width()) * 2.f - 1.f,
-                1.f - (float(y) / height()) * 2.f,
-                -1.f,
-                1.f);
+        (float(x) / width()) * 2.f - 1.f,
+        1.f - (float(y) / height()) * 2.f,
+        -1.f,
+        1.f);
 
     Eigen::Vector4f transformed_coords = m_camera.getProjection().inverse() * clipCoords;
     transformed_coords = Eigen::Vector4f(transformed_coords.x(), transformed_coords.y(), -1.f, 0.f);

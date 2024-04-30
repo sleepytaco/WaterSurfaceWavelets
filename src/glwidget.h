@@ -69,4 +69,9 @@ private:
     bool m_rightCapture;
     SelectMode m_rightClickSelectMode;
     int m_lastSelectedVertex = -1;
+
+    void setupSkybox();
+    Shader* m_skybox_shader;
+    GLuint skyboxTexture;
+    GLuint skyboxVAO, skyboxVBO, skyboxEBO;
 };

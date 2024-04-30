@@ -46,6 +46,7 @@ public:
     void setUniformArrayByIndex(const std::string &name, const Eigen::Matrix3f &mat3, size_t index);
     void setUniformArrayByIndex(const std::string &name, const Eigen::Matrix4f &mat4, size_t index);
 
+    GLuint getGLuint();
 
     void bind() const;
     void unbind() const;

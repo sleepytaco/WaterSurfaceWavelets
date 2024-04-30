@@ -73,9 +73,9 @@ void Shape::init(const vector<Vector3f> &vertices, const vector<Vector3i> &trian
     m_numSurfaceVertices = faces.size() * 3;
     m_verticesSize = vertices.size();
     m_faces = triangles;
-    m_red   = 0.5f + 0.5f * rand() / ((float) RAND_MAX);
-    m_blue  = 0.5f + 0.5f * rand() / ((float) RAND_MAX);
-    m_green = 0.5f + 0.5f * rand() / ((float) RAND_MAX);
+    m_red   = 0.01f;
+    m_blue  = 0.7f;
+    m_green = 0.6f;
     m_alpha = 1.0f;
 
     updateShapeCentroid(verts);
