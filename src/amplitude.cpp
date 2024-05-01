@@ -141,6 +141,8 @@ double Amplitude::spacialDiffusion(double dt, Vector2d idxPos, int xIdx, int yId
     //boundaryReflection(advPos, thetaIdx);
 
     double ref_d = theta_refl * dTheta;
+
+    Vector2d idxAdvpos = posToIdxSpace(advPos);
     Vector2d d = Vector2d(cos(ref_d), sin(ref_d));
 
     Vector2d p_n1 = idxPos - dXY * d;
@@ -154,7 +156,7 @@ double Amplitude::spacialDiffusion(double dt, Vector2d idxPos, int xIdx, int yId
     std::vector<double> nv;
     #pragma omp parallel
     for(int i = 0; i < p.size(); ++i){
-        v.push_back(bilerp(p[i], theta_refl, waveNumber));
+        v.push_back(bilerp(posToIdxSpace(p[i]), theta_refl, waveNumber));
     }
 
     for(int i = 1; i < v.size() - 1; ++i){
@@ -164,7 +166,7 @@ double Amplitude::spacialDiffusion(double dt, Vector2d idxPos, int xIdx, int yId
 
     double adv_t = (advPos - p_0).norm()/dXY;
     double spatial_diffuse = catmullRom(nv, adv_t);
-    return bilerp(advPos, theta_refl, waveNumber);
+    return spatial_diffuse;
 }
 
 double Amplitude::diffusionStep(double dt, Vector2d idxPos, int xIdx, int yIdx, int thetaIdx, double waveNumber) {
