@@ -19,7 +19,7 @@ void Simulation::update(double deltaTime) {
         solver->RK4(m_particleSystems[i], deltaTime / 2); // use RK4 to integrate the state of the particle system forward in time
         m_fallingShapes[i]->setVertices(m_particleSystems[i]->getVertices());
     }
-    m_amplitude.timeStep(deltaTime / 2);
+    m_amplitude.timeStep(deltaTime);
     setWaterHeights();
 }
 
@@ -28,9 +28,10 @@ void Simulation::setWaterHeights() {
     for (int i = 0; i < undisturbedPoints.size(); i++) {
         Vector3f vertex = undisturbedPoints[i];
         Vector2d xz = Vector2d(vertex.x(), vertex.z());
-        newPoints[i].x() = vertex.x() + m_amplitude.waterHeight(xz).cast<float>().x();
-        newPoints[i].y() = m_amplitude.waterHeight(xz).cast<float>().z();
-        newPoints[i].z() = vertex.z() + m_amplitude.waterHeight(xz).cast<float>().y();
+        Vector3f displacement = m_amplitude.waterHeight(xz).cast<float>();
+        newPoints[i].x() = vertex.x() + displacement.x();
+        newPoints[i].y() = displacement.z();
+        newPoints[i].z() = vertex.z() + displacement.y();
     }
     m_shape.setVertices(newPoints);
 }
