@@ -38,23 +38,43 @@ double Amplitude::interpolateAmplitude4d(Vector2d x, double theta, double waveNu
     // print("interpolate 4d");
 
     // this takes wayyy too slow to run as expected
-    for (int i=0; i<=dimXY; ++i) { // a
-        for (int j=0; j<=dimXY; ++j) { // a
-            for (int b=0; b<=dimTheta; ++b) { // b
+//    for (int i=0; i<=dimXY; ++i) { // a
+//        for (int j=0; j<=dimXY; ++j) { // a
+//            for (int b=0; b<=dimTheta; ++b) { // b
+//                for (int c=0; c<=dimK; ++c) { // c
+//                   // see eqn 16 for phi_a, nu_b, psi_c (which are basis functions)
+//                   double phi_a = hatFunction(i, x.x(), dimXY, dXY) * hatFunction(j, x.y(), dimXY, dXY);
+//                   double nu_b = hatFunction(b, theta, dimTheta, dTheta) ;
+//                   double psi_c = hatFunction(c, waveNumber, dimK, dK);
+
+//                   approxA += m_currentAmplitude.get(i, j, b, c) * phi_a * nu_b * psi_c;
+//                }
+//            }
+//        }
+//    }
+
+    // TODO: working on narrowing down the search as most of the times phi_a, nu_b, psi_c are going to be 0s, except around
+    // the inputs x, theta, waveNumber values
+    int iMin = std::fmax(0, ((x.x() - config.xMin) / dXY) - 2); int iMax = std::min(iMin + 4, dimXY);
+    int jMin = std::fmax(0, ((x.y() - config.yMin) / dXY) - 2); int jMax = std::min(jMin + 4, dimXY);
+    int bMin = std::fmax(0, ((theta - config.thetaMin) / dTheta) - 2); int bMax = std::min(bMin + 4, dimTheta);
+    int cMin = std::fmax(0, ((waveNumber - config.kMin) / dK) - 2); int cMax = std::min(cMin + 4, dimK);
+
+    for (int i=iMin; i<=iMax; ++i) { // a
+        for (int j=jMin; j<=jMax; ++j) { // a
+            for (int b=bMin; b<=bMax; ++b) { // b
                 for (int c=0; c<=dimK; ++c) { // c
                    // see eqn 16 for phi_a, nu_b, psi_c (which are basis functions)
                    double phi_a = hatFunction(i, x.x(), dimXY, dXY) * hatFunction(j, x.y(), dimXY, dXY);
-                   double nu_b = hatFunction(b, theta, dimTheta, dTheta) ;
+                   double nu_b = hatFunction(b, theta, dimTheta, dTheta);
                    double psi_c = hatFunction(c, waveNumber, dimK, dK);
-
-                   approxA += m_currentAmplitude.get(i, j, b, c) * phi_a * nu_b * psi_c;
+                   double A = m_currentAmplitude.get(i, j, b, c) ;
+                   approxA += A * A * A * phi_a * nu_b * psi_c;
                 }
             }
         }
     }
 
-    // TODO: working on narrowing down the search as most of the times phi_a, nu_b, psi_c are going to be 0s, except around
-    // the inputs x, theta, waveNumber values
 
     return approxA;
 }
