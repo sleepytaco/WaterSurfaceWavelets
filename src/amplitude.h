@@ -45,7 +45,7 @@ public:
 
     double diffusionStep(double dt, Vector2d idx, int xIdx, int yIdx, int thetaIdx, double waveNumber);
 
-    double catmullRom(std::vector<Vector2d>& segments, double adv_t);
+    double catmullRom(std::vector<double>& segments, double adv_t);
 
     void amplitudeSpread(double dt);
 

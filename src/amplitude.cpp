@@ -138,20 +138,20 @@ double Amplitude::spacialDiffusion(double dt, Vector2d idxPos, int xIdx, int yId
 
     Vector2d advPos = advectionPos(idxPos, dt, theta_d, dK);
     int theta_refl = thetaIdx;
-    boundaryReflection(advPos, thetaIdx);
+    //boundaryReflection(advPos, thetaIdx);
 
     double ref_d = theta_refl * dTheta;
     Vector2d d = Vector2d(cos(ref_d), sin(ref_d));
 
-    Vector2d p_n1 = idxPos + dXY * d;
-    Vector2d p_n2 = idxPos + dXY * d * 2;
-    Vector2d p_p1 = idxPos - dXY * d;
-    Vector2d p_p2 = idxPos - dXY * d * 2;
-    Vector2d p_p3 = idxPos - dXY * d * 3;
+    Vector2d p_n1 = idxPos - dXY * d;
+    Vector2d p_n2 = idxPos - dXY * d * 2;
+    Vector2d p_p1 = idxPos + dXY * d;
+    Vector2d p_p2 = idxPos + dXY * d * 2;
+    Vector2d p_p3 = idxPos + dXY * d * 3;
 
     std::vector<Vector2d> p{p_n2, p_n1, p_0, p_p1, p_p2, p_p3};
     std::vector<double> v;
-    std::vector<Vector2d> nv;
+    std::vector<double> nv;
     #pragma omp parallel
     for(int i = 0; i < p.size(); ++i){
         v.push_back(bilerp(p[i], theta_refl, waveNumber));
@@ -159,13 +159,12 @@ double Amplitude::spacialDiffusion(double dt, Vector2d idxPos, int xIdx, int yId
 
     for(int i = 1; i < v.size() - 1; ++i){
         double diffused = (1 - 2 * delta * dt/pow(dXY, 2)) * v[i] + delta * dt/pow(dXY, 2) * (v[i - 1] + v[i + 1]);
-        Vector2d idx_diff = Vector2d(i, diffused);
-        nv.push_back(idx_diff);
+        nv.push_back(diffused);
     }
 
     double adv_t = (advPos - p_0).norm()/dXY;
     double spatial_diffuse = catmullRom(nv, adv_t);
-    return spatial_diffuse;
+    return bilerp(advPos, theta_refl, waveNumber);
 }
 
 double Amplitude::diffusionStep(double dt, Vector2d idxPos, int xIdx, int yIdx, int thetaIdx, double waveNumber) {

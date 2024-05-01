@@ -100,21 +100,11 @@ double Amplitude::bilerp(Vector2d x, double theta, double waveNumber){
     return outp;
 }
 
-double Amplitude::catmullRom(std::vector<Vector2d>& segments, double adv_t){
-    double alpha = 0.5;
+double Amplitude::catmullRom(std::vector<double>& segments, double adv_t){
+    double d_1 = (segments[2] - segments[0])/2.0;
+    double d_2 = (segments[3] - segments[1])/2.0;
+    double dq = segments[2] - segments[1];
 
-    double t01 = pow((segments[1] - segments[0]).norm(), alpha);
-    double t12 = pow((segments[2] - segments[1]).norm(), alpha);
-    double t23 = pow((segments[3] - segments[2]).norm(), alpha);
-
-    Vector2d m1 =(segments[2] - segments[1] + t12 * ((segments[1] - segments[0]) / t01 - (segments[2] - segments[0]) / (t01 + t12)));
-    Vector2d m2 = (segments[2] - segments[1] + t12 * ((segments[3] - segments[2]) / t23 - (segments[3] - segments[1]) / (t12 + t23)));
-
-    Vector2d a = 2.0 * (segments[1] - segments[2]) + m1 + m2;
-    Vector2d b = -3.0 * (segments[1] - segments[2]) - m1 - m1 - m2;
-    Vector2d c = m1;
-    Vector2d d = segments[1];
-
-    Vector2d interpolated = a * adv_t * adv_t * adv_t + b * adv_t * adv_t + c * adv_t + d;
-    return interpolated(1);
+    double interpolated = segments[1] + d_1 * adv_t + (3 * dq - 2 * d_1 - d_2) * adv_t * adv_t + (-2 * dq + d_1 + d_2) * adv_t * adv_t *adv_t;
+    return interpolated;
 }
