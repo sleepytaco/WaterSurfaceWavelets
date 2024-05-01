@@ -110,12 +110,12 @@ void GLWidget::setupSkybox() {
 
     // from https://learnopengl.com/Advanced-OpenGL/Cubemaps
     std::vector<std::string> textures_faces = {
-        "skybox/right.jpg",
-        "skybox/left.jpg",
-        "skybox/top.jpg",
-        "skybox/bottom.jpg",
-        "skybox/front.jpg",
-        "skybox/back.jpg"
+        "skyboxes/skybox4/right.jpg",
+        "skyboxes/skybox4/left.jpg",
+        "skyboxes/skybox4/top.jpg",
+        "skyboxes/skybox4/bottom.jpg",
+        "skyboxes/skybox4/front.jpg",
+        "skyboxes/skybox4/back.jpg"
     };
 
     glGenTextures(1, &skyboxTexture);
@@ -181,18 +181,18 @@ void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // ---------- SKYBOX ----------
     glDepthMask(GL_FALSE);
     glUseProgram(m_skybox_shader->getGLuint());
 
     glUniform1i(glGetUniformLocation(m_skybox_shader->getGLuint(), "u_skybox"), 0);
 
+    // written by GPT to take top left 3x3 of 4x4 view matrix
     Eigen::Matrix4f tempMatrix = Eigen::Matrix4f::Identity();
     tempMatrix.block<3,3>(0,0) = m_camera.getView().block<3,3>(0,0);
-
     glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader->getGLuint(), "u_viewMatrix"), 1, GL_FALSE, tempMatrix.data());
-    //    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader->getGLuint(), "u_viewMatrix"), 1, GL_FALSE, &glm::mat4(glm::mat3(m_view))[0][0]);
+
     glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader->getGLuint(), "u_projectionMatrix"), 1, GL_FALSE, m_camera.getProjection().data());
-    //    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader->getGLuint(), "u_projectionMatrix"), 1, GL_FALSE, &m_proj[0][0]);
 
     glBindVertexArray(skyboxVAO);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
@@ -200,7 +200,14 @@ void GLWidget::paintGL()
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glDepthMask(GL_TRUE);
 
+    // ---------- REFLECT AND REFRACT ----------
+
     m_defaultShader->bind();
+    glUseProgram(m_defaultShader->getGLuint()); // use the shader program for rendering
+    glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "u_skybox"), 0);
+    glUniform1f(glGetUniformLocation(m_defaultShader->getGLuint(), "u_reflection"), 1);
+    glUniform1f(glGetUniformLocation(m_defaultShader->getGLuint(), "u_refraction"), 0);
+    glUniform1f(glGetUniformLocation(m_defaultShader->getGLuint(), "u_materialRefractiveIndex"), 0);
     m_defaultShader->setUniform("proj", m_camera.getProjection());
     m_defaultShader->setUniform("view", m_camera.getView());
     m_sim.draw(m_defaultShader, GL_TRIANGLES);
