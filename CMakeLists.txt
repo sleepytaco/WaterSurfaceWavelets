@@ -52,6 +52,8 @@ add_executable(${PROJECT_NAME}
     src/FEM/solver.cpp
     src/FEM/solver.h
 
+    src/basis.cpp
+
     src/mainwindow.h
     src/simulation.h
     src/glwidget.h
