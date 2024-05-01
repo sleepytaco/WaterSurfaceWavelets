@@ -110,12 +110,12 @@ void GLWidget::setupSkybox() {
 
     // from https://learnopengl.com/Advanced-OpenGL/Cubemaps
     std::vector<std::string> textures_faces = {
-        "skyboxes/skybox2/right.jpg",
-        "skyboxes/skybox2/left.jpg",
-        "skyboxes/skybox2/top.jpg",
-        "skyboxes/skybox2/bottom.jpg",
-        "skyboxes/skybox2/front.jpg",
-        "skyboxes/skybox2/back.jpg"
+        "skyboxes/skybox4/right.jpg",
+        "skyboxes/skybox4/left.jpg",
+        "skyboxes/skybox4/top.jpg",
+        "skyboxes/skybox4/bottom.jpg",
+        "skyboxes/skybox4/front.jpg",
+        "skyboxes/skybox4/back.jpg"
     };
 
     glGenTextures(1, &skyboxTexture);
