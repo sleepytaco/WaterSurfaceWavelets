@@ -21,8 +21,8 @@ Amplitude::Amplitude() {
 //                    continue;
 //                }
 //                if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
-//                if (j <= 20)
-                    m_currentAmplitude.get(i, j, theta, 0) = 0; unif(re) * sin((i + j) / 2);
+                if (j <= 20)
+                    m_currentAmplitude.get(i, j, 3, 0) = 10; unif(re) * sin((i + j) / 2);
             }
         }
     }
@@ -83,7 +83,7 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
     double theta = thetaIdx * dTheta;
     Vector2d waveDirection = Vector2d(cos(theta), sin(theta));
 
-    Vector2d advPos_refl = advPos + 2 * boundaryDistance * boundaryNormal;
+    Vector2d advPos_refl = advPos - 2 * boundaryDistance * boundaryNormal;
 //    if (advPos_refl != advPos)
 //        std::cout << advPos.x() << "," << advPos.y() << " -> " << advPos_refl.x() << "," << advPos_refl.y() << std::endl;
     advPos = advPos_refl;
