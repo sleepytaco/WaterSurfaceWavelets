@@ -22,7 +22,7 @@ Amplitude::Amplitude() {
 //                }
 //                if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
                 if (j <= 20)
-                    m_currentAmplitude.get(i, j, 3, 0) = 10; unif(re) * sin((i + j) / 2);
+                    m_currentAmplitude.get(i, j, 3, 0) = 0; unif(re) * sin((i + j) / 2);
             }
         }
     }

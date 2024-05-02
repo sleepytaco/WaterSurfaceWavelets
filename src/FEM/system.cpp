@@ -154,7 +154,7 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
      for (int k = i-3; k <= i+3; k++) {
          for (int l = j-3; l <= j+3; l++) {
              for (int theta=0; theta<=config.dimTheta; ++theta) { // b
-//                 _amplitude4d->m_currentAmplitude.get(k, l, theta, 0) = -10;
+                 _amplitude4d->m_currentAmplitude.get(k, l, theta, 0) = -10;
              }
          }
      }
