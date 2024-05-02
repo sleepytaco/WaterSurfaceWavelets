@@ -27,7 +27,8 @@ void Simulation::setWaterHeights() {
 //    std::vector<Eigen::Vector3f> new_vertices = m_shape.getVertices();
     for (int i = 0; i < undisturbedPoints.size(); i++) {
         Vector3f vertex = undisturbedPoints[i];
-        Vector2d xz = Vector2d(vertex.x(), vertex.z());
+        Vector2d xz = Vector2d(vertex.x() / config.dimXY * (config.xMax - config.xMin) + config.xMin, vertex.z() / config.dimXY * (config.yMax - config.yMin) + config.yMin);
+//        std::cout << "Getting height at " << xz.x() << "," << xz.y() << std::endl;
         Vector3f displacement = m_amplitude.waterHeight(xz).cast<float>();
         newPoints[i].x() = vertex.x() + displacement.x();
         newPoints[i].y() = displacement.z();
