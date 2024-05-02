@@ -60,19 +60,19 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
     // TODO: maybe also apply boudnary conditions if water is hitting terrain
     Vector2d boundaryNormal = Vector2d(0, 0);
     double boundaryDistance = 0;
-    if (advPos.x() < xMin) {
+    if (advPos.x() < xMin + dXY) {
         boundaryNormal = Vector2d(1, 0);
         boundaryDistance = abs(advPos.x() - xMin);
     }
-    else if (advPos.x() > xMax) {
+    else if (advPos.x() > xMax - dXY) {
         boundaryNormal = Vector2d(-1, 0);
         boundaryDistance = abs(advPos.x() - xMax);
     }
-    else if (advPos.y() < yMin) {
+    else if (advPos.y() < yMin + dXY) {
         boundaryNormal = Vector2d(0, 1);
         boundaryDistance = abs(advPos.y() - yMin);
     }
-    else if (advPos.y() > yMax) {
+    else if (advPos.y() > yMax - dXY) {
         boundaryNormal = Vector2d(0, -1);
         boundaryDistance = abs(advPos.y() - yMax);
     }
