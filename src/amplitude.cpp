@@ -20,9 +20,9 @@ Amplitude::Amplitude() {
 //                    //m_currentAmplitude.get(i, j, theta, 0) = unif(re); 20 * sin((i + j) / 1);
 //                    continue;
 //                }
-//                if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
-                if (j <= 20)
-                    m_currentAmplitude.get(i, j, 3, 0) = 0; unif(re) * sin((i + j) / 2);
+                if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
+//                if (j >= 100)
+                    m_currentAmplitude.get(i, j, theta, 0) = 30; unif(re) * sin((i + j) / 2);
             }
         }
     }
@@ -83,7 +83,7 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
     double theta = thetaIdx * dTheta;
     Vector2d waveDirection = Vector2d(cos(theta), sin(theta));
 
-    Vector2d advPos_refl = advPos - 2 * boundaryDistance * boundaryNormal;
+    Vector2d advPos_refl = advPos + 2 * boundaryDistance * boundaryNormal;
 //    if (advPos_refl != advPos)
 //        std::cout << advPos.x() << "," << advPos.y() << " -> " << advPos_refl.x() << "," << advPos_refl.y() << std::endl;
     advPos = advPos_refl;
@@ -91,8 +91,9 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
 
     Vector2d k_refl = waveDirection - 2 * (boundaryNormal.dot(waveDirection)) * boundaryNormal;
     double theta_refl = atan2(k_refl.y(), k_refl.x());
+//    std::cout << theta * 180 / M_PI << " -> " << theta_refl * 180 / M_PI << " " << boundaryNormal.x() << "," << boundaryNormal.y() << std::endl;
     if (theta_refl < 0) theta_refl += 2*M_PI;
-    int thetaIdx_refl = round(theta_refl / dTheta);
+    int thetaIdx_refl = floor(theta_refl / dTheta);
     thetaIdx = thetaIdx_refl;
 }
 
@@ -126,7 +127,7 @@ void Amplitude::advectionStep(double dt) {
             Vector2d x_a = idxToPos(i, j); // x_a = (x, y)
             double k_c = dK; // wave number
 
-            for (int theta=0; theta<=dimTheta; ++theta) { // b
+            for (int theta=0; theta<dimTheta; ++theta) { // b
 
                 double theta_b = theta*dTheta;
                 Vector2d advPos = advectionPos(x_a, dt, theta_b, k_c);// pos "back in time" ---- x_jump, y_jump
@@ -146,13 +147,13 @@ void Amplitude::advectionStep(double dt) {
 double Amplitude::diffusionStep(double dt, Vector2d idxSpaceAdvPos, int xIdx, int yIdx, int thetaIdx, double waveNumber) {
     // fill in the newAmplitudeGrid with interpolated amplitude values at (x_jump, y_jump)
     double A = bilerp(idxSpaceAdvPos, thetaIdx, waveNumber);
-    return A;
-
     //calulate diffusion here
     double dissapation = 0; //2*1e-6*k_c*k_c*A; // including this term from paper stabalizes the water to a sheet pretty quickly
-    double gamma = 0.025 * advectionSpeed(waveNumber) * pow(dTheta, 2)/dimXY;
-    double prev = m_currentAmplitude.get(xIdx, yIdx, (thetaIdx - 1)%dimTheta, 0);
-    double next = m_currentAmplitude.get(xIdx, yIdx, (thetaIdx + 1)%dimTheta, 0);
+    double gamma = 0.025 * advectionSpeed(waveNumber) * pow(dTheta, 2)/dXY;
+    double prevThetaIdx = thetaIdx == 0 ? 15 : thetaIdx - 1;
+    double nextThetaIdx = thetaIdx == 15 ? 0 : thetaIdx + 1;
+    double prev = m_currentAmplitude.get(xIdx, yIdx, prevThetaIdx, 0);
+    double next = m_currentAmplitude.get(xIdx, yIdx, nextThetaIdx, 0);
     double s_d = (1 - 2 * gamma * dt/pow(dTheta, 2)) * A + gamma * dt/pow(dTheta, 2) * (prev + next);
     return s_d - dissapation;
 }
