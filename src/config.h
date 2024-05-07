@@ -16,7 +16,7 @@ struct Config {
     const int numThetaSamples = 16;
 
     // number of samples for 4D amplitude grid
-    const int dimXY = 64; // we assume same X and Y samples
+    const int dimXY = 128; // we assume same X and Y samples
     const int dimTheta = 16;
     const int dimK = 1;
 
@@ -41,6 +41,7 @@ struct Config {
     constexpr static const double waveNumberMin = 314.159; // wave number = 2pi/wavelength
     constexpr static const double waveNumberMax = 0.483;
     constexpr static const double bufferExtent = 40.0;
+    constexpr static const double pScalar = 2.5;
     constexpr static const int numSubintervals = 50; // For integration
     constexpr static const double g = 9.81;
     constexpr static const double sigma = 	0.072;

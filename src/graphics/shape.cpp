@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "graphics/shader.h"
+#include <unordered_map>
 
 using namespace Eigen;
 using namespace std;

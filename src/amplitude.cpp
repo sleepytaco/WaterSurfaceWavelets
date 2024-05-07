@@ -4,8 +4,8 @@
 
 Amplitude::Amplitude() {
     std::cout << "amplitude constructor" << std::endl;
-    double lower_bound = -20;
-    double upper_bound = 20;
+    double lower_bound = -50;
+    double upper_bound = 50;
     std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
     std::default_random_engine re;
 
@@ -20,10 +20,11 @@ Amplitude::Amplitude() {
 //                    //m_currentAmplitude.get(i, j, theta, 0) = unif(re); 20 * sin((i + j) / 1);
 //                    continue;
 //                }
-                //if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
+//                if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
 //                if (j >= 100)
-                  m_currentAmplitude.get(i, j, theta, 0) = 0; unif(re) * sin((i + j) / 2);
-                    //m_currentAmplitude.get(i, j, theta, 0) = unif(re) * sin((i + j) / 2);
+//                  m_currentAmplitude.get(i, j, theta, 0) = 0; unif(re) * sin((i + j) / 2);
+                if (theta >= 1 && theta <= 5)
+                    m_currentAmplitude.get(i, 0, theta, 0) = 40;unif(re) * sin((i + j) / 2);
             }
         }
     }
@@ -153,7 +154,7 @@ Vector3d Amplitude::waterHeight(Vector2d pos) {
     for (int b = 0; b < numThetaSamples; b++) {
         double theta = 2.0 * M_PI * (double)b / (double)numThetaSamples;
         Vector2d waveDirection = Vector2d(cos(theta), sin(theta));
-        double p = waveDirection.dot(pos);
+        double p = waveDirection.dot(pos) * config.pScalar;
         Vector4d profile = m_profileBuffer.getValueAt(p);
 
         for (int c = 1; c <= numWaveNumberSamples; c++) {
