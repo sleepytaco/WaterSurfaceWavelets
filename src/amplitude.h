@@ -41,7 +41,7 @@ public:
 
     void advectionStep(double dt);
 
-    double diffusionStep(double dt, Vector2d idxSpaceAdvPos, int xIdx, int yIdx, int thetaIdx, double waveNumber);
+    double diffusionStep(double dt, double A, int xIdx, int yIdx, int thetaIdx, double waveNumber);
 
     void amplitudeSpread(double dt);
 
@@ -67,6 +67,8 @@ private:
     double bilerp(Vector2d x, double theta, double waveNumber);
 
     double catmullRom(std::vector<double>& segments, double adv_t);
+
+    double spacialDiffusion(double dt, Vector2d idxPos, int xIdx, int yIdx, int thetaIdx, double waveNumber);
 
     double m_time = 0.0; // accumulate time across timesteps
 

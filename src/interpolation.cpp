@@ -129,3 +129,12 @@ double Amplitude::bilerp(Vector2d x, double theta, double waveNumber) {
 //        std::cout << interpolatedValue << std::endl;
     return interpolatedValue;
 }
+
+double Amplitude::catmullRom(std::vector<double>& segments, double adv_t){
+    double d_1 = (segments[2] - segments[0])/2.0;
+    double d_2 = (segments[3] - segments[1])/2.0;
+    double dq = segments[2] - segments[1];
+
+    double interpolated = segments[1] + d_1 * adv_t + (3 * dq - 2 * d_1 - d_2) * adv_t * adv_t + (-2 * dq + d_1 + d_2) * adv_t * adv_t *adv_t;
+    return interpolated;
+}
