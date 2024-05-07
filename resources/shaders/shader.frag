@@ -22,7 +22,7 @@ uniform vec4 upwelling = vec4(0.0, 0.2, 0.3, 1.0);
 uniform vec4 sky = vec4(0.69, 0.84, 1.0, 1.0);
 uniform vec4 air = vec4(0.1, 0.1, 0.1, 1.0);
 uniform float nSnell = 1.34;
-uniform float Kdiffuse = 0.71;
+uniform float Kdiffuse = 0.91;
 uniform samplerCube envmap;
 
 void main() {

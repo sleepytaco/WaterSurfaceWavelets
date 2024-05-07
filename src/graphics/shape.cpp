@@ -260,22 +260,43 @@ void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
                        const std::vector<Eigen::Vector3f> &vertices,
                        std::vector<Eigen::Vector3f>& verts,
                        std::vector<Eigen::Vector3f>& normals,
-                       std::vector<Eigen::Vector3f>& colors)
-{
+                       std::vector<Eigen::Vector3f>& colors) {
     verts.reserve(faces.size() * 3);
     normals.reserve(faces.size() * 3);
 
-    for (const Eigen::Vector3i& face : faces) {
-        Vector3f n = getNormal(face);
+    // Temporary structure to accumulate normals per vertex
+    std::unordered_map<int, Eigen::Vector3f> normalSums;
+    std::unordered_map<int, int> normalCounts;
 
-        for (auto& v: {face[0], face[1], face[2]}) {
-            normals.push_back(n);
+    // Initialize the maps
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        normalSums[i] = Eigen::Vector3f::Zero();
+        normalCounts[i] = 0;
+    }
+
+    // First pass: accumulate the face normals per vertex
+    for (const Eigen::Vector3i &face : faces) {
+        Eigen::Vector3f n = getNormal(face);
+
+        for (auto &v : {face[0], face[1], face[2]}) {
+            normalSums[v] += n;
+            normalCounts[v]++;
+        }
+    }
+
+    // Second pass: normalize and assign per-vertex normals
+    for (const Eigen::Vector3i &face : faces) {
+        for (auto &v : {face[0], face[1], face[2]}) {
+            Eigen::Vector3f averagedNormal = normalSums[v] / static_cast<float>(normalCounts[v]);
+            averagedNormal.normalize();
+
+            normals.push_back(averagedNormal);
             verts.push_back(vertices[v]);
 
             if (m_anchors.find(v) == m_anchors.end()) {
-                colors.push_back(Vector3f(1,0,0));
+                colors.push_back(Eigen::Vector3f(1, 0, 0));
             } else {
-                colors.push_back(Vector3f(0, 1 - m_green, 1 - m_blue));
+                colors.push_back(Eigen::Vector3f(0, 1 - m_green, 1 - m_blue));
             }
         }
     }
