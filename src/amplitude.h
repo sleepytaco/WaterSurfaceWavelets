@@ -66,6 +66,8 @@ private:
 
     double bilerp(Vector2d x, double theta, double waveNumber);
 
+    double catmullRom(std::vector<double>& segments, double adv_t);
+
     double m_time = 0.0; // accumulate time across timesteps
 
     // number of samples for 4D amplitude grid
