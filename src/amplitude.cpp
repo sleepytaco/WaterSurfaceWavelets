@@ -22,7 +22,7 @@ Amplitude::Amplitude() {
 //                }
                 if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
 //                if (j >= 100)
-                    m_currentAmplitude.get(i, j, theta, 0) = 30; unif(re) * sin((i + j) / 2);
+                    m_currentAmplitude.get(i, j, theta, 0) = 0; unif(re) * sin((i + j) / 2);
             }
         }
     }
@@ -170,7 +170,7 @@ Vector3d Amplitude::waterHeight(Vector2d pos) {
         double theta = 2.0 * M_PI * (double)b / (double)numThetaSamples;
         Vector2d waveDirection = Vector2d(cos(theta), sin(theta));
         double p = waveDirection.dot(pos);
-        Vector2d profile = m_profileBuffer.getValueAt(p);
+        Vector4d profile = m_profileBuffer.getValueAt(p);
 
         for (int c = 1; c <= numWaveNumberSamples; c++) {
 
@@ -183,7 +183,8 @@ Vector3d Amplitude::waterHeight(Vector2d pos) {
 
             // Gerstner Waves: https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf
             Vector2d profileXZ = waveDirection * profile.x();
-            Vector3d profilePos = bilerp(posToIdxSpace(pos), b, waveNumber) * Vector3d(profileXZ.x(), profile.y(), profileXZ.y());
+            double amplitude = bilerp(posToIdxSpace(pos), b, waveNumber);
+            Vector3d profilePos = amplitude * Vector3d(profileXZ.x(), profile.y(), profileXZ.y());
             Vector2d XZScalar = -waveDirection / waveNumber;
             profilePos = profilePos.cwiseProduct(Vector3d(XZScalar.x(), 1, XZScalar.y()));
             total += profilePos; // no shot this works first time. check here when things inevitably break
