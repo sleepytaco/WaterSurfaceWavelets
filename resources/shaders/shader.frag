@@ -53,7 +53,7 @@ void main() {
 
     // Sample from the environment map if available
 //    if (envmap != "") {
-//        skyColor = texture(envmap, nN);
+        skyColor = texture(u_skybox, nN);
 //    }
 
     fragColor = dist * (reflectivity * skyColor + (1 - reflectivity) * upwelling) + (1 - dist) * air;
@@ -95,17 +95,17 @@ void main() {
 
 //void main() {
 
-////    vec3 normalizedWorldNorm = normalize(worldNorm);
+//    vec3 normalizedWorldNorm = normalize(worldNorm);
 
-////    vec3 vecToPos = normalize(worldPos - vec3(cameraPos));
-////    float reflectance = pow((1.f-u_materialRefractiveIndex) / (1.f+u_materialRefractiveIndex), 2);
+//    vec3 vecToPos = normalize(worldPos - vec3(cameraPos));
+//    float reflectance = pow((1.f-u_materialRefractiveIndex) / (1.f+u_materialRefractiveIndex), 2);
 
-////    float fresnel = max(reflectance + (1.f-reflectance) * pow((1.f-cos(dot(normalizedWorldNorm, -vecToPos))), 5.f), 0.1f);
+//    float fresnel = max(reflectance + (1.f-reflectance) * pow((1.f-cos(dot(normalizedWorldNorm, -vecToPos))), 5.f), 0.1f);
 
-////    vec3 refractVec = normalize(refract(vecToPos, normalizedWorldNorm, 1.f/u_materialRefractiveIndex));
-////    vec3 reflectVec = normalize(reflect(vecToPos, normalizedWorldNorm));
+//    vec3 refractVec = normalize(refract(vecToPos, normalizedWorldNorm, 1.f/u_materialRefractiveIndex));
+//    vec3 reflectVec = normalize(reflect(vecToPos, normalizedWorldNorm));
 
-////    fragColor = fresnel * u_reflection * texture(u_skybox, reflectVec) + (1.f-fresnel) * u_refraction * texture(u_skybox, refractVec);
+//    fragColor = fresnel * u_reflection * texture(u_skybox, reflectVec) + (1.f-fresnel) * u_refraction * texture(u_skybox, refractVec);
 
 //    // Do lighting in camera space
 //    vec3 lightDir = normalize(vec3(0, 0.5, 1));
