@@ -68,7 +68,7 @@ private:
 
     double catmullRom(std::vector<double>& segments, double adv_t);
 
-    double spacialDiffusion(double dt, Vector2d idxPos, int xIdx, int yIdx, int thetaIdx, double waveNumber);
+    double spatialDiffusion(double dt, Vector2d idxPos, int xIdx, int yIdx, int thetaIdx, double waveNumber);
 
     double m_time = 0.0; // accumulate time across timesteps
 
