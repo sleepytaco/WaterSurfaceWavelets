@@ -256,6 +256,7 @@ Vector3f Shape::getNormal(const Vector3i& face)
     return n.normalized();
 }
 
+// ---------- updateMesh written by GPT ----------
 void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
                        const std::vector<Eigen::Vector3f> &vertices,
                        std::vector<Eigen::Vector3f>& verts,
@@ -303,4 +304,32 @@ void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
 
     updateShapeCentroid(verts);
 }
+
+//// ---------- OLD updateMesh ----------
+//void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
+//                       const std::vector<Eigen::Vector3f> &vertices,
+//                       std::vector<Eigen::Vector3f>& verts,
+//                       std::vector<Eigen::Vector3f>& normals,
+//                       std::vector<Eigen::Vector3f>& colors)
+//{
+//    verts.reserve(faces.size() * 3);
+//    normals.reserve(faces.size() * 3);
+
+//    for (const Eigen::Vector3i& face : faces) {
+//        Vector3f n = getNormal(face);
+
+//        for (auto& v: {face[0], face[1], face[2]}) {
+//            normals.push_back(n);
+//            verts.push_back(vertices[v]);
+
+//            if (m_anchors.find(v) == m_anchors.end()) {
+//                colors.push_back(Vector3f(1,0,0));
+//            } else {
+//                colors.push_back(Vector3f(0, 1 - m_green, 1 - m_blue));
+//            }
+//        }
+//    }
+
+//    updateShapeCentroid(verts);
+//}
 
