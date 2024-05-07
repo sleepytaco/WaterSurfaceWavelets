@@ -1,6 +1,6 @@
 #include "amplitude.h"
 
-double Amplitude::spacialDiffusion(double dt, Vector2d idxPos, int xIdx, int yIdx, int thetaIdx, double waveNumber){
+double Amplitude::spatialDiffusion(double dt, Vector2d idxPos, int xIdx, int yIdx, int thetaIdx, double waveNumber){
     Vector2d p_0 = idxPos;
     double delta = 0.00001 * pow(dXY, 2) * pow(dK, 2) * fabs(advectionAccel(dK));
 

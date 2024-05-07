@@ -20,9 +20,10 @@ Amplitude::Amplitude() {
 //                    //m_currentAmplitude.get(i, j, theta, 0) = unif(re); 20 * sin((i + j) / 1);
 //                    continue;
 //                }
-                if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
+                //if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
 //                if (j >= 100)
-                    m_currentAmplitude.get(i, j, theta, 0) = 30; unif(re) * sin((i + j) / 2);
+                    //m_currentAmplitude.get(i, j, theta, 0) = unif(re) * sin((i + j) / 2);
+                m_currentAmplitude.get(i, 0, theta, 0) = 30;
             }
         }
     }
@@ -129,7 +130,7 @@ void Amplitude::advectionStep(double dt) {
 
             for (int theta=0; theta<dimTheta; ++theta) { // b
 
-                double A = spacialDiffusion(dt, x_a, i, j, theta, k_c);
+                double A = spatialDiffusion(dt, x_a, i, j, theta, k_c);
 //                std::cout << A << std::endl;
                 m_newAmplitude.get(i, j, theta, 0) = A;
 
