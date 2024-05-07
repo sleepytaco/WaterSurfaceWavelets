@@ -18,12 +18,12 @@ uniform float green = 1.0;
 uniform float blue  = 1.0;
 uniform float alpha = 1.0;
 
+// ---------- SOURCE: https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf ----------
 uniform vec4 upwelling = vec4(0.0, 0.2, 0.3, 1.0);
 uniform vec4 sky = vec4(0.69, 0.84, 1.0, 1.0);
 uniform vec4 air = vec4(0.1, 0.1, 0.1, 1.0);
 uniform float nSnell = 1.34;
-uniform float Kdiffuse = 0.71;
-uniform samplerCube envmap;
+uniform float Kdiffuse = 0.91;
 
 void main() {
     vec3 nI = normalize(worldPos - vec3(cameraPos));
@@ -51,47 +51,10 @@ void main() {
 
     vec4 skyColor = sky;
 
-    // Sample from the environment map if available
-//    if (envmap != "") {
-        skyColor = texture(u_skybox, nN);
-//    }
+    skyColor = texture(u_skybox, nN);
 
     fragColor = dist * (reflectivity * skyColor + (1 - reflectivity) * upwelling) + (1 - dist) * air;
 }
-
-//vec4 upwelling = vec4(0   , 0.2 , 0.3, 1);
-//vec4 sky       = vec4(0.69, 0.84, 1  , 1);
-//vec4 air       = vec4(0.1 , 0.1 , 0.1, 1);
-//float nSnell   = 1.34;
-//float Kdiffuse = 0.91;
-//float reflectivity;
-
-//void main() {
-
-//    vec3 nI = normalize(worldPos - vec3(cameraPos));
-//    vec3 nN = normalize(worldNorm);
-
-//    float costhetai = abs(nI * nN);
-//    float thetai = acos(costhetai);
-//    float sinthetat = sin(thetai)/nSnell;
-//    float thetat = asin(sinthetat);
-
-//    if (thetai == 0.0) {
-//        reflectivity = (nSnell - 1)/(nSnell + 1);
-//        reflectivity = reflectivity * reflectivity;
-//    } else {
-//        float fs = sin(thetat - thetai) / sin(thetat + thetai);
-//        float ts = tan(thetat - thetai) / tan(thetat + thetai);
-//        reflectivity = 0.5 * ( fs*fs + ts*ts );
-//    }
-
-//    vec3 dPE = worldPos - vec3(cameraPos);
-//    float dist = length(dPE) * Kdiffuse;
-//    dist = exp(-dist);
-
-//    fragColor = dist * (reflectivity * sky + (1-reflectivity) * upwelling) + (1-dist)* air;
-
-//}
 
 //void main() {
 
@@ -107,9 +70,9 @@ void main() {
 
 //    fragColor = fresnel * u_reflection * texture(u_skybox, reflectVec) + (1.f-fresnel) * u_refraction * texture(u_skybox, refractVec);
 
-//    // Do lighting in camera space
-//    vec3 lightDir = normalize(vec3(0, 0.5, 1));
-//    float c = clamp(dot(normal_cameraSpace, lightDir), 0, 1);
+////    // Do lighting in camera space
+////    vec3 lightDir = normalize(vec3(0, 0.5, 1));
+////    float c = clamp(dot(normal_cameraSpace, lightDir), 0, 1);
 
-//    fragColor = vec4(red * c, green * c, blue * c, 1);
+////    fragColor = vec4(red * c, green * c, blue * c, 1);
 //}
