@@ -65,7 +65,7 @@ add_executable(${PROJECT_NAME}
 
     util/tiny_obj_loader.h
     util/unsupportedeigenthing/OpenGLSupport
-    src/diffusion.h src/diffusion.cpp
+    src/diffusion.cpp
     src/grid.h src/grid.cpp
     src/interpolation.cpp
     src/graphics/stb_image.h
