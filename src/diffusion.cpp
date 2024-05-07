@@ -15,11 +15,11 @@ double Amplitude::spacialDiffusion(double dt, Vector2d idxPos, int xIdx, int yId
     Vector2d idxAdvpos = posToIdxSpace(advPos);
     Vector2d d = Vector2d(cos(ref_d), sin(ref_d));
 
-    Vector2d p_n1 = idxPos - dXY * d;
-    Vector2d p_n2 = idxPos - dXY * d * 2;
-    Vector2d p_p1 = idxPos + dXY * d;
-    Vector2d p_p2 = idxPos + dXY * d * 2;
-    Vector2d p_p3 = idxPos + dXY * d * 3;
+    Vector2d p_n1 = idxPos + dXY * d;
+    Vector2d p_n2 = idxPos + dXY * d * 2;
+    Vector2d p_p1 = idxPos - dXY * d;
+    Vector2d p_p2 = idxPos - dXY * d * 2;
+    Vector2d p_p3 = idxPos - dXY * d * 3;
 
     std::vector<Vector2d> p{p_n2, p_n1, p_0, p_p1, p_p2, p_p3};
     std::vector<double> v;
@@ -35,7 +35,8 @@ double Amplitude::spacialDiffusion(double dt, Vector2d idxPos, int xIdx, int yId
     }
 
     double adv_t = (advPos - p_0).norm()/dXY;
-    double spatial_diffuse = catmullRom(nv, adv_t);
+    //double spatial_diffuse = catmullRom(nv, adv_t);
+    double spatial_diffuse = bilerp(idxAdvpos, theta_refl, dK);
     double angle_diffuse = diffusionStep(dt, spatial_diffuse, xIdx, yIdx, thetaIdx, waveNumber);
     return angle_diffuse;
 }
