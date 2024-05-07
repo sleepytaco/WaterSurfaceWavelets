@@ -110,12 +110,12 @@ void GLWidget::setupSkybox() {
 
     // from https://learnopengl.com/Advanced-OpenGL/Cubemaps
     std::vector<std::string> textures_faces = {
-        "skyboxes/skybox4/right.jpg",
-        "skyboxes/skybox4/left.jpg",
-        "skyboxes/skybox4/top.jpg",
-        "skyboxes/skybox4/bottom.jpg",
-        "skyboxes/skybox4/front.jpg",
-        "skyboxes/skybox4/back.jpg"
+        "skyboxes/skybox1/right.jpg",
+        "skyboxes/skybox1/left.jpg",
+        "skyboxes/skybox1/top.jpg",
+        "skyboxes/skybox1/bottom.jpg",
+        "skyboxes/skybox1/front.jpg",
+        "skyboxes/skybox1/back.jpg"
     };
 
     glGenTextures(1, &skyboxTexture);
@@ -197,7 +197,7 @@ void GLWidget::paintGL()
     glBindVertexArray(skyboxVAO);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
 
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+//    glDrawArrays(GL_TRIANGLES, 0, 36);
     glDepthMask(GL_TRUE);
 
     // ---------- REFLECT AND REFRACT ----------
