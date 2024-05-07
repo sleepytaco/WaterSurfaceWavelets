@@ -11,22 +11,7 @@ Amplitude::Amplitude() {
 
     m_currentAmplitude = Grid();
     m_newAmplitude = Grid();
-    for (int i=0; i<=dimXY; ++i) { // a
-        for (int j=0; j<=dimXY; ++j) { // a
-            for (int theta=0; theta<=dimTheta; ++theta) { // b
-                // uncomment to init a sqaure with 0 amplitude in the center of the grid
-//                Vector2d x_a = idxToPos(i, j); // x_a = (x, y)
-//                if ((x_a.x() >= 500 && x_a.x() <= 3500) && (x_a.y() >= 500 && x_a.y() <= 3500)) {
-//                    //m_currentAmplitude.get(i, j, theta, 0) = unif(re); 20 * sin((i + j) / 1);
-//                    continue;
-//                }
-                //if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
-//                if (j >= 100)
-                    //m_currentAmplitude.get(i, j, theta, 0) = unif(re) * sin((i + j) / 2);
-                m_currentAmplitude.get(i, 0, theta, 0) = 30;
-            }
-        }
-    }
+
     m_profileBuffer = ProfileBuffer();
 }
 
@@ -132,7 +117,7 @@ void Amplitude::advectionStep(double dt) {
 
                 double A = spatialDiffusion(dt, x_a, i, j, theta, k_c);
 //                std::cout << A << std::endl;
-                m_newAmplitude.get(i, j, theta, 0) = A;
+                m_newAmplitude.set(i, j, theta, 0, A);
 
             }
         }

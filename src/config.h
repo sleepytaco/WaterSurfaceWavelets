@@ -35,7 +35,7 @@ struct Config {
 
 
     // ------- ProfileBuffer.h --------
-    constexpr static const int bufferSize = 128;
+    constexpr static const int bufferSize = 256;
     constexpr static const double wavelengthMin = 0.02; // defined
     constexpr static const double wavelengthMax = 13.0;
     constexpr static const double waveNumberMin = 314.159; // wave number = 2pi/wavelength

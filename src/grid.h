@@ -4,6 +4,7 @@
 #include "config.h"
 #include "Eigen/Dense"
 #include <iostream>
+#include <random>
 #include <unordered_set>
 #include <deque>
 #include <set>
@@ -17,13 +18,17 @@ public:
     Grid();
 
     double& get(Vector2i pos, int theta, int k);
-    double& get(int x, int y, int theta, int k);
+    double get(int x, int y, int theta, int k);
+
+    void set(int x, int y, int theta, int k, double A);
 
     std::vector<Vector3f>& getVertices(){return vertices;}
     std::vector<Vector3i>& getTriangles(){return triangles;}
 
 
 private:
+    int lower_bound = -5;
+    int upper_bound = 5;
     size_t dims = config.dimXY;
     size_t theta = config.dimTheta;
     size_t k = config.dimK;
@@ -33,6 +38,8 @@ private:
 
     std::vector<Vector3f> vertices;
     std::vector<Vector3i> triangles;
+    std::default_random_engine re;
+    std::uniform_real_distribution<double> unif;
 
     int gridIndex(int i1, int i2, int i3, int i4){return i4 + k * (i3 + theta * (i2 + dims * i1));}
 };
