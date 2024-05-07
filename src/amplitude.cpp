@@ -4,14 +4,13 @@
 
 Amplitude::Amplitude() {
     std::cout << "amplitude constructor" << std::endl;
-    double lower_bound = -20;
-    double upper_bound = 20;
+    double lower_bound = -50;
+    double upper_bound = 50;
     std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
     std::default_random_engine re;
 
     m_currentAmplitude = Grid();
     m_newAmplitude = Grid();
-
     m_profileBuffer = ProfileBuffer();
 }
 
@@ -138,8 +137,8 @@ Vector3d Amplitude::waterHeight(Vector2d pos) {
     for (int b = 0; b < numThetaSamples; b++) {
         double theta = 2.0 * M_PI * (double)b / (double)numThetaSamples;
         Vector2d waveDirection = Vector2d(cos(theta), sin(theta));
-        double p = waveDirection.dot(pos);
-        Vector2d profile = m_profileBuffer.getValueAt(p);
+        double p = waveDirection.dot(pos) * config.pScalar;
+        Vector4d profile = m_profileBuffer.getValueAt(p);
 
         for (int c = 1; c <= numWaveNumberSamples; c++) {
 
@@ -152,7 +151,8 @@ Vector3d Amplitude::waterHeight(Vector2d pos) {
 
             // Gerstner Waves: https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf
             Vector2d profileXZ = waveDirection * profile.x();
-            Vector3d profilePos = bilerp(posToIdxSpace(pos), b, waveNumber) * Vector3d(profileXZ.x(), profile.y(), profileXZ.y());
+            double amplitude = bilerp(posToIdxSpace(pos), b, waveNumber);
+            Vector3d profilePos = amplitude * Vector3d(profileXZ.x(), profile.y(), profileXZ.y());
             Vector2d XZScalar = -waveDirection / waveNumber;
             profilePos = profilePos.cwiseProduct(Vector3d(XZScalar.x(), 1, XZScalar.y()));
             total += profilePos; // no shot this works first time. check here when things inevitably break

@@ -8,7 +8,7 @@
 
 using namespace Eigen;
 
-#define FUNCTION std::function<Vector2d(double)>
+#define FUNCTION std::function<Vector4d(double)>
 
 class ProfileBuffer
 {
@@ -16,7 +16,7 @@ public:
     ProfileBuffer();
 
     void precompute(double time);
-    Vector2d getValueAt(double p);
+    Vector4d getValueAt(double p);
     double dispersion(double waveNumber);
     double spectrum(double waveNumber);
 
@@ -25,11 +25,12 @@ private:
     FUNCTION integrand(double p, double time);
 
     // Simpson's 1/3 rule: https://en.wikipedia.org/wiki/Simpson%27s_rule
-    Vector2d integrate(double minBound, double maxBound, FUNCTION& fun);
+    Vector4d integrate(double minBound, double maxBound, FUNCTION& fun);
 
-    // See implementation details for explanation
+    // Cubic polynomial weighting for seamless tiling (implementation details)
     double h00(double s);
     double h01(double s);
+    Vector4d cubicPolynomial(double p, double waveNumber, double time);
 
     // Pierson-Moskowitz, eq. 20 from https://dl.acm.org/doi/pdf/10.1145/2791261.2791267
 
@@ -45,7 +46,7 @@ private:
     constexpr static const double U = config.U; // average wind speed
 
     // Members
-    std::array<Vector2d, bufferSize> m_buffer;
+    std::array<Vector4d, bufferSize> m_buffer;
 };
 
 #endif // PROFILEBUFFER_H

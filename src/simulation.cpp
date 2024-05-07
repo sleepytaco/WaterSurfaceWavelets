@@ -10,6 +10,8 @@
 using namespace std;
 using namespace Eigen;
 
+const float scale = 2.5;
+
 Simulation::Simulation()
     : m_amplitude()
 {}
@@ -27,7 +29,7 @@ void Simulation::setWaterHeights() {
 //    std::vector<Eigen::Vector3f> new_vertices = m_shape.getVertices();
     for (int i = 0; i < undisturbedPoints.size(); i++) {
         Vector3f vertex = undisturbedPoints[i];
-        Vector2d xz = Vector2d(vertex.x() / config.dimXY * (config.xMax - config.xMin) + config.xMin, vertex.z() / config.dimXY * (config.yMax - config.yMin) + config.yMin);
+        Vector2d xz = Vector2d(vertex.x() / (config.dimXY*scale) * (config.xMax - config.xMin) + config.xMin, vertex.z() / (config.dimXY*scale) * (config.yMax - config.yMin) + config.yMin);
 //        std::cout << "Getting height at " << xz.x() << "," << xz.y() << std::endl;
         Vector3f displacement = m_amplitude.waterHeight(xz).cast<float>();
         newPoints[i].x() = vertex.x() + displacement.x();
@@ -54,7 +56,7 @@ void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 
     for(int i = 0; i < size; ++i){
         for(int j = 0; j < size; ++j){
-            vertices.push_back(Vector3f(j, 0, i));
+            vertices.push_back(Vector3f(j * scale, 0, i * scale));
 
         }
     }
