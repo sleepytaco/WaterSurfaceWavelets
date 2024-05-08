@@ -76,6 +76,8 @@ add_executable(${PROJECT_NAME}
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
 add_library(StaticGLEW STATIC glew/src/glew.c
     src/profilebuffer.h src/profilebuffer.cpp
+
+
 )
 include_directories(${PROJECT_NAME} PRIVATE glew/include)
 

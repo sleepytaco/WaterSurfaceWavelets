@@ -51,10 +51,13 @@ struct Config {
 
     // -------- Solid-fluid Coupling --------
     const float objUniformScale = 5; // scaling factor to scale the loaded meshes by
-    const float objMass = 1;
-    const float fluidDensity = 997; // units are kg/m^3 --- this is the density of water
+    const float objMass = 30;
+    const float fluidDensity = 0.001; // units are kg/m^3 --- this is the density of water
     // --------------------------------------
 
+    //-------- Mesh --------
+    const float meshScale = 5;
+    // ---------------------
 };
 
 // The global Config object

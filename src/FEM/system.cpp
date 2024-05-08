@@ -54,17 +54,18 @@ MatrixXf System::calculateForces(MatrixXf& currParticleStates) {
     Vector3f buoyancyForce = calculateBuoyancyForce(currParticleStates);
 
     for (int i=0; i<numParticles; ++i) {
-        // add external forces
-        forceAccumulator.col(i) += particleMass * _g; // force due to gravity
+        // force due to gravity
+        forceAccumulator.col(i) += particleMass * _g;
 
-        // add viscous drag too maybe ???
+        // force due to buoyancy
+        forceAccumulator.col(i) += buoyancyForce;
+
         Vector3f particleVelocity = currParticleStates.col(i).tail(3); // get the last 3 components from particle state which contains (pos3d, vel3d)
         double kd = 0.05; // 1/4e4;
         // Vector3d a = particleAcc.col(i);
         forceAccumulator.col(i) -= kd * particleVelocity;// * particleMass; // force prop to opp direction of particle's velocity it is moving in
 
-        // force due to the particle hitting the water surface
-        forceAccumulator.col(i) += buoyancyForce;
+
 
     }
 
@@ -90,14 +91,13 @@ Vector3f System::getWorldSpaceDir(Vector3f dir, Matrix4f modelMat) {
 
 
 Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
-
     Vector3f buoyancyForce(0, 0, 0);
     Vector3f shapeCOMMatSpace = fallingShape->getShapeCentroid(); // center of mass of the falling shape
     Vector3f shapeCOM = getWorldSpacePos(shapeCOMMatSpace, fallingShape->getModelMatrix()); // COM in world space
 
     Vector3f particlePosMatSpace = currParticleStates.col(0).head(3); // retrieve the relevant particle position from state
     Vector3f particlePos = getWorldSpacePos(particlePosMatSpace, fallingShape->getModelMatrix()); // particle pos in world space
-    float shapeRadius = (particlePos - shapeCOM).norm(); // TODO: get from config file or calc it
+    float shapeRadius = 5; // TODO: get from config file or calc it
 
     // get smallest/lowest y-coord of all the vertices in the falling shape obj
     float smallestShapeY = particlePos.y();
@@ -107,59 +107,38 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
         smallestShapeY = std::min(smallestShapeY, particlePos.y());
     }
 
-    // get largest/highest y-coord of all the vertices in the water surface mesh
-    float largestWaterSurfaceY = waterSurfaceShape->getVertices()[0].y();
-    for (const Vector3f& v : waterSurfaceShape->getVertices()) {
-        largestWaterSurfaceY = std::max(largestWaterSurfaceY, v.y());
-    }
+    Vector2d particleSurfacePos = Vector2d(particlePos.x(), particlePos.z()) / config.meshScale;
+    float waterSurfaceY = _amplitude4d->waterHeight(particleSurfacePos).y();   
 
-    if (smallestShapeY - largestWaterSurfaceY > 0) { // this means the entirity of the shape is above the water surface
+    if (smallestShapeY - waterSurfaceY > 0) { // this means the entirity of the shape is above the water surface
         return buoyancyForce; // return 0 force
     }
 
     // formula from paper
-//    float h = (largestWaterSurfaceY - smallestShapeY); // TODO: don't fully get what this is
-//    float waterHeight = largestWaterSurfaceY;
-//    float V = M_PI * shapeRadius * shapeRadius * (waterHeight - shapeRadius - h); // "volume" of submerged portion
-//    float rho = 1; config.fluidDensity;
-//    buoyancyForce = -1 * rho * V * _g;
+    float h = fmin(waterSurfaceY - smallestShapeY, shapeRadius); // TODO: don't fully get what this is
+    float V = M_PI * shapeRadius * shapeRadius * h; // "volume" of submerged portion
+    float rho = config.fluidDensity;
+    buoyancyForce = -_g * rho * V;
 
-    // naive way
-     buoyancyForce = Vector3f(0, (largestWaterSurfaceY - smallestShapeY), 0); // * (largestWaterSurfaceY - smallestShapeY);
-     Vector2d xz(0, 0);
-     for (const Vector3f& v : waterSurfaceShape->getVertices()) {
-         if (std::abs(smallestShapeY - v.y()) < buoyancyForce[1]) {
-             buoyancyForce[1] = std::abs(smallestShapeY - v.y());
-             xz = Vector2d(v.x(), v.z()); // store the vertex in xz
-         }
-     }
+    Vector2d idxSpacePos = _amplitude4d->posToIdxSpace(particleSurfacePos);
+    double idxSpaceX = idxSpacePos.x();
+    double idxSpaceY = idxSpacePos.y();
+    int i = floor(idxSpaceX);
+    int j = floor(idxSpaceY);
 
-    // xz is meant to be the closest vertex to the cube's smallest y coord
-    // it should approximatelty locate the cube on the grid
-    Vector2d x_a = xz;// x_a = (x, y)
+    Vector3f particleVelocity = currParticleStates.col(0).tail(3);
+    double rigidEnergy = config.objMass * particleVelocity.squaredNorm() * 0.5 + config.objMass * config.g * h;
+    if (prevRigidEnergy == -1) prevRigidEnergy = rigidEnergy;
+    double rigidEnergyDelta = rigidEnergy - prevRigidEnergy;
+    rigidEnergyDelta = -abs(rigidEnergyDelta);
+    prevRigidEnergy = rigidEnergy;
 
-    // TODO: getting i, j this way does not seem to work... bug in posToIdxSpace? hardcoded i, j below
-//     Vector2d idxSpacePos = _amplitude4d->posToIdxSpace(x_a);
-//     double idxSpaceX = idxSpacePos.x();
-//     double idxSpaceY = idxSpacePos.y();
-//     int i = floor(idxSpaceX);
-//     int j = floor(idxSpaceY);
-
-     // hard code location i, j for now (this is a single cube's drop location)
-     int i = config.dimXY/2; // std::floor(x_a.x());
-     int j = config.dimXY/2; // std::floor(x_a.y());
-
-     // my attempt at "distributing" amplitude among all thetas at a grid location i, j
-     // assuming initial amplitude condition of
-     for (int k = i-3; k <= i+3; k++) {
-         for (int l = j-3; l <= j+3; l++) {
-             for (int theta=0; theta<=config.dimTheta; ++theta) { // b
-//                 _amplitude4d->m_currentAmplitude.get(k, l, theta, 0) = -10;
-             }
-         }
-     }
-
-
+    for (int theta=0; theta<=config.dimTheta; ++theta) { // b
+        double currentAmp = _amplitude4d->m_currentAmplitude.get(i, j, theta, 0);
+//        double fluidEnergy = 0.5 * rho * config.g * currentAmp * currentAmp;
+        double newAmp = 2 / (rho * 1000 * config.g) * (rigidEnergyDelta / config.dimTheta);
+        _amplitude4d->m_currentAmplitude.set(i, j, theta, 0, newAmp);
+    }
 
     return buoyancyForce;
 }

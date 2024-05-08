@@ -46,6 +46,8 @@ public:
     // making an assumption that all shapes are approximated by a sphere
     Eigen::Vector3f getShapeCentroid() {return shapeCentroid;};
 
+    void setColor(float r, float g, float b) {m_red=r; m_blue=b; m_green=g;}
+
 private:
     GLuint m_surfaceVao;
     GLuint m_surfaceVbo;

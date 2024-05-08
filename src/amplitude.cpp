@@ -85,7 +85,7 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
 // assuming deep water dispersion: this is the equation for omega' if omega = sqrt(gk)
 // TODO: this might be too simple and need to factor in additional terms
 double Amplitude::advectionSpeed(double waveNumber) {
-    return 0.5 * sqrt(config.g / waveNumber) * 10;
+    return 0.5 * sqrt(config.g / waveNumber);
 //    double val = config.g/(2 * sqrt(config.g * waveNumber + config.sigma * pow(waveNumber, 3)));
 //    return val;
 }

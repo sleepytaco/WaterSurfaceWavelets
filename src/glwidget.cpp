@@ -208,9 +208,12 @@ void GLWidget::paintGL()
     glUniform1f(glGetUniformLocation(m_defaultShader->getGLuint(), "u_reflection"), 1);
     glUniform1f(glGetUniformLocation(m_defaultShader->getGLuint(), "u_refraction"), 0);
     glUniform1f(glGetUniformLocation(m_defaultShader->getGLuint(), "u_materialRefractiveIndex"), 0);
+    glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 0);
     m_defaultShader->setUniform("proj", m_camera.getProjection());
     m_defaultShader->setUniform("view", m_camera.getView());
     m_sim.draw(m_defaultShader, GL_TRIANGLES);
+    glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 1);
+    m_sim.drawShapes(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();
 
     glClear(GL_DEPTH_BUFFER_BIT);

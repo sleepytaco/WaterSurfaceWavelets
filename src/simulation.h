@@ -32,6 +32,8 @@ private:
     Solver* solver; // used to integrate the all m_particleSystems states forward in time (contains eulerstep, midpointstep, rk4 integrators)
     // ===========================================
 
+    Shape* boatShape;
+
 public:
     Simulation();
 
@@ -52,6 +54,9 @@ public:
     void draw(Shader *shader, GLenum mode)
     {
         m_shape.draw(shader, mode); // water surface mesh
+    }
+
+    void drawShapes(Shader *shader, GLenum mode) {
         for (int i=0; i<m_fallingShapes.size(); ++i) { // draw all the objs thrown on the water surface mesh
             m_fallingShapes[i]->draw(shader, mode);
         }

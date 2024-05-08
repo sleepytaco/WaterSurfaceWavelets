@@ -18,7 +18,7 @@ Grid::Grid()
                 //                    //m_currentAmplitude.get(i, j, theta, 0) = unif(re); 20 * sin((i + j) / 1);
                 //                    continue;
                 //                }
-                //if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
+//                if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
                 //                if (j >= 100)
                 //m_currentAmplitude.get(i, j, theta, 0) = unif(re) * sin((i + j) / 2);
                 this->set(i, 0, th, 0, 60 + this->unif(re));
@@ -37,7 +37,7 @@ double Grid::get(int x, int y, int theta, int k) {
         return 0;
     }
     if (y < 0) {
-        return 30 + unif(re);;
+        return 0;
     }
     if (x > dims - 1) {
         return 0;

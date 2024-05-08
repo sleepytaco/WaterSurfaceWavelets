@@ -54,4 +54,6 @@ private:
     // utils
     Vector3f getWorldSpacePos(Vector3f pos, Matrix4f modelMat);
     Vector3f getWorldSpaceDir(Vector3f dir, Matrix4f modelMat);
+
+    double prevRigidEnergy = -1;
 };
