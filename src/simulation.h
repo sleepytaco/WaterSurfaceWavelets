@@ -21,7 +21,7 @@ private:
     double upper_bound;
     std::vector<Eigen::Vector3f> undisturbedPoints;
     std::vector<Eigen::Vector3f> newPoints;
-
+    std::vector<Eigen::Vector3f> normals;
 
     // ============== Solid-fluid Coupling related stuff
     std::vector<Shape*> m_fallingShapes; // global list of all falling objs in the scene

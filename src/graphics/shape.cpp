@@ -103,6 +103,27 @@ void Shape::setVertices(const vector<Vector3f> &vertices)
     updateShapeCentroid(verts);
 }
 
+void Shape::setVertices(const vector<Vector3f> &vertices, const vector<Vector3f> &normals)
+{
+    m_vertices.clear();
+    copy(vertices.begin(), vertices.end(), back_inserter(m_vertices));
+
+    vector<Vector3f> verts;
+    vector<Vector3f> norms;
+    vector<Vector3f> colors;
+
+    updateMesh(m_faces, vertices, normals, verts, norms, colors);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (norms.size() * 3) + (colors.size() * 3)), nullptr, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * verts.size() * 3, static_cast<const void *>(verts.data()));
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * verts.size() * 3, sizeof(float) * norms.size() * 3, static_cast<const void *>(norms.data()));
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (norms.size() * 3)), sizeof(float) * colors.size() * 3, static_cast<const void *>(colors.data()));
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    updateShapeCentroid(verts);
+}
+
 void Shape::updateShapeCentroid(std::vector<Eigen::Vector3f>& verts) {
     for (Eigen::Vector3f& vert : verts) {
         shapeCentroid += vert;
@@ -113,6 +134,7 @@ void Shape::updateShapeCentroid(std::vector<Eigen::Vector3f>& verts) {
 // ================== Model Matrix
 
 void Shape::setModelMatrix(const Affine3f &model) { m_modelMatrix = model.matrix(); }
+void Shape::setModelMatrix(const Eigen::Matrix4f &model) { m_modelMatrix = model; }
 
 // ================== General Graphics Stuff
 
@@ -307,6 +329,32 @@ void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
 }
 
 //// ---------- OLD updateMesh ----------
+void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
+                       const std::vector<Eigen::Vector3f> &vertices,
+                       const std::vector<Eigen::Vector3f> &normals,
+                       std::vector<Eigen::Vector3f>& verts,
+                       std::vector<Eigen::Vector3f>& norms,
+                       std::vector<Eigen::Vector3f>& colors)
+{
+    verts.reserve(faces.size() * 3);
+    norms.reserve(faces.size() * 3);
+
+    for (const Eigen::Vector3i& face : faces) {
+        for (auto& v: {face[0], face[1], face[2]}) {
+            norms.push_back(normals[v]);
+            verts.push_back(vertices[v]);
+
+            if (m_anchors.find(v) == m_anchors.end()) {
+                colors.push_back(Vector3f(1,0,0));
+            } else {
+                colors.push_back(Vector3f(0, 1 - m_green, 1 - m_blue));
+            }
+        }
+    }
+
+    updateShapeCentroid(verts);
+}
+
 //void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
 //                       const std::vector<Eigen::Vector3f> &vertices,
 //                       std::vector<Eigen::Vector3f>& verts,

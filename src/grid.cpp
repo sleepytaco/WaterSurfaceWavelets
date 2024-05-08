@@ -21,7 +21,7 @@ Grid::Grid()
 //                if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
                 //                if (j >= 100)
                 //m_currentAmplitude.get(i, j, theta, 0) = unif(re) * sin((i + j) / 2);
-                this->set(i, 0, th, 0, 60 + this->unif(re));
+                this->set(i, 0, th, 0, 100 + this->unif(re));
             }
         }
     }

@@ -21,6 +21,12 @@ void Simulation::update(double deltaTime) {
     }
     m_amplitude.timeStep(deltaTime);
     setWaterHeights();
+    if (config.rotateLeft) {
+        m_particleSystems[0]->rotateBoat(1);
+    }
+    else if (config.rotateRight) {
+        m_particleSystems[0]->rotateBoat(-1);
+    }
 }
 
 void Simulation::setWaterHeights() {
@@ -29,10 +35,13 @@ void Simulation::setWaterHeights() {
         Vector3f vertex = undisturbedPoints[i];
         Vector2d xz = Vector2d(vertex.x() / (config.dimXY*config.meshScale) * (config.xMax - config.xMin), vertex.z() / (config.dimXY*config.meshScale) * (config.yMax - config.yMin));
 //        std::cout << "Getting height at " << xz.x() << "," << xz.y() << std::endl;
-        Vector3f displacement = m_amplitude.waterHeight(xz).cast<float>();
-        newPoints[i].x() = vertex.x() + displacement.x();
-        newPoints[i].y() = displacement.z();
-        newPoints[i].z() = vertex.z() + displacement.y();
+        auto [displacement, normal] = m_amplitude.waterHeight(xz);
+        Vector3f displacementf = displacement.cast<float>();
+        Vector3f normalf = normal.cast<float>();
+        newPoints[i].x() = vertex.x() + displacementf.x();
+        newPoints[i].y() = displacementf.z();
+        newPoints[i].z() = vertex.z() + displacementf.y();
+        normals[i] = normalf;
     }
     m_shape.setVertices(newPoints);
 }
@@ -84,6 +93,7 @@ void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 
     undisturbedPoints = m_shape.getVertices();
     newPoints.resize(undisturbedPoints.size());
+    normals.resize(undisturbedPoints.size());
 }
 
 // initializes an obj to drop on the water surface mesh

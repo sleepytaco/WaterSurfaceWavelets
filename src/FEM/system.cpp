@@ -19,6 +19,8 @@ System::System(std::vector<Vector3f>& vertices, std::vector<Vector3i>& faces) {
                  Vector3f(0, 0, 0); // particle initial velocity
         _particleStates.col(i) = state;
     }
+
+    config.driveForce = Vector3d::Zero();
 }
 
 // derivEval loop from slides
@@ -65,7 +67,8 @@ MatrixXf System::calculateForces(MatrixXf& currParticleStates) {
         // Vector3d a = particleAcc.col(i);
         forceAccumulator.col(i) -= kd * particleVelocity;// * particleMass; // force prop to opp direction of particle's velocity it is moving in
 
-
+        Eigen::Matrix3f mat = AngleAxisf(config.boatRotation, Vector3f::UnitY()).toRotationMatrix();
+        forceAccumulator.col(i) += mat*config.driveForce.cast<float>();
 
     }
 
@@ -108,7 +111,8 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
     }
 
     Vector2d particleSurfacePos = Vector2d(particlePos.x(), particlePos.z()) / config.meshScale;
-    float waterSurfaceY = _amplitude4d->waterHeight(particleSurfacePos).y();   
+    auto [displacement, normal] = _amplitude4d->waterHeight(particleSurfacePos);
+    float waterSurfaceY = displacement.y();
 
     if (smallestShapeY - waterSurfaceY > 0) { // this means the entirity of the shape is above the water surface
         return buoyancyForce; // return 0 force
@@ -137,7 +141,7 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
         double currentAmp = _amplitude4d->m_currentAmplitude.get(i, j, theta, 0);
 //        double fluidEnergy = 0.5 * rho * config.g * currentAmp * currentAmp;
         double newAmp = 2 / (rho * 1000 * config.g) * (rigidEnergyDelta / config.dimTheta);
-        _amplitude4d->m_currentAmplitude.set(i, j, theta, 0, newAmp);
+        _amplitude4d->m_currentAmplitude.set(i, j, theta, 0, newAmp * 3);
     }
 
     return buoyancyForce;
@@ -150,4 +154,22 @@ std::vector<Vector3f> System::getVertices() {
         vertices.push_back(state);
     }
     return vertices;
+}
+
+void System::rotateBoat(int direction) {
+    config.boatRotation += direction * 0.01 * M_PI;
+    float totalX = 0;
+    float totalZ = 0;
+    for (int i=0; i<numParticles; ++i) {
+        Vector3f pos = _particleStates.col(i).head(3);
+        totalX += pos.x();
+        totalZ += pos.z();
+    }
+    Vector3f center = Vector3f(totalX/numParticles, 0, totalZ/numParticles);
+
+    for (int i=0; i<numParticles; ++i) {
+        Vector3f pos = _particleStates.col(i).head(3);
+        Eigen::Matrix3f mat = AngleAxisf(direction * 0.01 * M_PI, Vector3f::UnitY()).toRotationMatrix();
+        _particleStates.col(i).head(3) = mat * (pos - center) + center;
+    }
 }

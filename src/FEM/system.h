@@ -28,6 +28,10 @@ public:
 
     void setAmplitudeFunction(Amplitude* amp) { _amplitude4d = amp;};
 
+    Vector3f driveForce;
+
+    void rotateBoat(int direction);
+
 private:
     const int particleStateDim = 6; // dim of an individual particle (position3f + velocity3f)
     double t = 0; // current time in system

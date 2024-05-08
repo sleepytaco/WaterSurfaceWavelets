@@ -28,8 +28,11 @@ public:
 
     void init(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3i> &triangles);
     void setVertices(const std::vector<Eigen::Vector3f> &vertices);
+    void setVertices(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3f> &normals);
+
 
     void setModelMatrix(const Eigen::Affine3f &model);
+    void setModelMatrix(const Eigen::Matrix4f &model);
     void setupSkybox();
 
     void draw(Shader *shader, GLenum mode);
@@ -79,4 +82,11 @@ private:
                            std::vector<Eigen::Vector3f>& verts,
                            std::vector<Eigen::Vector3f>& normals,
                            std::vector<Eigen::Vector3f>& colors);
+
+    void updateMesh(const std::vector<Eigen::Vector3i> &triangles,
+                    const std::vector<Eigen::Vector3f> &vertices,
+                    const std::vector<Eigen::Vector3f> &normals,
+                    std::vector<Eigen::Vector3f>& verts,
+                    std::vector<Eigen::Vector3f>& norms,
+                    std::vector<Eigen::Vector3f>& colors);
 };
