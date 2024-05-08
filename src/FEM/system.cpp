@@ -110,7 +110,7 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
         smallestShapeY = std::min(smallestShapeY, particlePos.y());
     }
 
-    Vector2d particleSurfacePos = Vector2d(particlePos.x(), particlePos.z()) / config.meshScale;
+    Vector2d particleSurfacePos = Vector2d(particlePos.x() / (config.dimXY*config.meshScale) * (config.xMax - config.xMin), particlePos.z() / (config.dimXY*config.meshScale) * (config.yMax - config.yMin));
     auto [displacement, normal] = _amplitude4d->waterHeight(particleSurfacePos);
     float waterSurfaceY = displacement.y();
 
@@ -129,19 +129,20 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
     double idxSpaceY = idxSpacePos.y();
     int i = floor(idxSpaceX);
     int j = floor(idxSpaceY);
+    std::cout << particlePos.x() << "," << particlePos.z() << std::endl;
 
     Vector3f particleVelocity = currParticleStates.col(0).tail(3);
     double rigidEnergy = config.objMass * particleVelocity.squaredNorm() * 0.5 + config.objMass * config.g * h;
     if (prevRigidEnergy == -1) prevRigidEnergy = rigidEnergy;
     double rigidEnergyDelta = rigidEnergy - prevRigidEnergy;
-    rigidEnergyDelta = -abs(rigidEnergyDelta);
+    rigidEnergyDelta = rigidEnergyDelta;
     prevRigidEnergy = rigidEnergy;
 
     for (int theta=0; theta<=config.dimTheta; ++theta) { // b
         double currentAmp = _amplitude4d->m_currentAmplitude.get(i, j, theta, 0);
 //        double fluidEnergy = 0.5 * rho * config.g * currentAmp * currentAmp;
         double newAmp = 2 / (rho * 1000 * config.g) * (rigidEnergyDelta / config.dimTheta);
-        _amplitude4d->m_currentAmplitude.set(i, j, theta, 0, newAmp * 3);
+        _amplitude4d->m_currentAmplitude.set(i, j, theta, 0, newAmp);
     }
 
     return buoyancyForce;
