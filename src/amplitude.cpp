@@ -115,6 +115,7 @@ void Amplitude::advectionStep(double dt) {
             for (int theta=0; theta<dimTheta; ++theta) { // b
 
                 double A = spatialDiffusion(dt, x_a, i, j, theta, k_c);
+
 //                std::cout << A << std::endl;
                 m_newAmplitude.set(i, j, theta, 0, A);
 
@@ -122,6 +123,7 @@ void Amplitude::advectionStep(double dt) {
         }
     }
     std::swap(m_newAmplitude, m_currentAmplitude);
+    m_currentAmplitude.applyWind();
 }
 
 

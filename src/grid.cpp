@@ -28,6 +28,7 @@ Grid::Grid()
         }
     }
 
+    applyWind();
 }
 
 
@@ -52,4 +53,19 @@ double Grid::get(int x, int y, int theta, int k) {
 void Grid::set(int x, int y, int theta, int k, double A){
     if(x >= 0 && x < dims && y >= 0 && y <dims && theta>=0 && theta < this->theta)
     amplitudeGrid[gridIndex(x,  y, theta, k)] = A;
+}
+
+void Grid::applyWind() {
+
+    std::uniform_real_distribution<double> ampUpperBound(2, 5);
+    std::uniform_real_distribution<double> thetaIdx(3, 10);
+    std::uniform_real_distribution<double> ampRand(0, ampUpperBound(re));
+
+    for (int i=0; i<=dims; ++i) { // a
+        for (int j=0; j<=dims; ++j) { // a
+            int thIdx = round(thetaIdx(re)); // just to get some slight randomness in the wind direction each time
+            double currA = this->get(i, j, thIdx, 0);
+            this->set(i, j, thIdx, 0, currA+ampRand(re));
+        }
+    }
 }

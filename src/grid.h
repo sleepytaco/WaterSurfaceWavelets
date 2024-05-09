@@ -25,10 +25,10 @@ public:
     std::vector<Vector3f>& getVertices(){return vertices;}
     std::vector<Vector3i>& getTriangles(){return triangles;}
 
-
+    void applyWind();
 private:
-    int lower_bound = -5;
-    int upper_bound = 5;
+    int lower_bound = -10;
+    int upper_bound = 10;
     size_t dims = config.dimXY;
     size_t theta = config.dimTheta;
     size_t k = config.dimK;

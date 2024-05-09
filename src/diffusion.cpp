@@ -46,6 +46,7 @@ double Amplitude::spatialDiffusion(double dt, Vector2d idxPos, int xIdx, int yId
     Vector2d advPos = advectionPos(idxPos, dt, theta_d, dK);
     int theta_refl = thetaIdx;
 
+    boundaryReflection(advPos, thetaIdx);
 
     double ref_d = theta_refl * dTheta;
 
@@ -76,12 +77,14 @@ double Amplitude::spatialDiffusion(double dt, Vector2d idxPos, int xIdx, int yId
     double adv_t = (advPos - idxPos).norm()/dXY;
     double spatial_diffuse = catmullRom(nv, adv_t);
     double angle_diffuse = diffusionStep(dt, spatial_diffuse, xIdx, yIdx, thetaIdx, waveNumber);
+
     return angle_diffuse;
 }
 
 double Amplitude::diffusionStep(double dt, double A, int xIdx, int yIdx, int thetaIdx, double waveNumber) {
     // fill in the newAmplitudeGrid with interpolated amplitude values at (x_jump, y_jump)
-    double dissapation = 0; //2*1e-6*k_c*k_c*A; // including this term from paper stabalizes the water to a sheet pretty quickly
+    double k_c = waveNumber;
+    double dissapation = 1.5*1e-6*k_c*k_c*A; // including this term from paper stabalizes the water to a sheet pretty quickly
     double gamma = 0.025 * advectionSpeed(waveNumber) * pow(dTheta, 2)/dXY;
     double prevThetaIdx = thetaIdx == 0 ? 15 : thetaIdx - 1;
     double nextThetaIdx = thetaIdx == 15 ? 0 : thetaIdx + 1;
