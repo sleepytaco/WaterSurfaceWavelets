@@ -129,7 +129,6 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
     double idxSpaceY = idxSpacePos.y();
     int i = floor(idxSpaceX);
     int j = floor(idxSpaceY);
-    std::cout << particlePos.x() << "," << particlePos.z() << std::endl;
 
     Vector3f particleVelocity = currParticleStates.col(0).tail(3);
     double rigidEnergy = config.objMass * particleVelocity.squaredNorm() * 0.5 + config.objMass * config.g * h;
