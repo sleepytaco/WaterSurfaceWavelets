@@ -49,7 +49,7 @@ void Simulation::setWaterHeights() {
 void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 {
     // drop objects on the water surface mesh (calling these adds System() instances to m_particleSystems)
-    initFallingParticleSystem("./meshes/boat2.obj", Vector3f(0, 30, 0));
+    initFallingParticleSystem("./meshes/boat2.obj", Vector3f(-250, 30, 250));
     // initFallingParticleSystem("./meshes/cube.obj", Vector3f(config.dimXY/4, 30, config.dimXY/4));
 
     // give all particleSystems access to the amplitude function (for solid-fluid coupling)

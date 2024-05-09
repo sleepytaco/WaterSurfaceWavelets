@@ -17,7 +17,7 @@ struct Config {
     const int numThetaSamples = 16;
 
     // number of samples for 4D amplitude grid
-    const int dimXY = 64; // we assume same X and Y samples
+    const int dimXY = 128; // we assume same X and Y samples
     const int dimTheta = 16;
     const int dimK = 1;
 
@@ -36,7 +36,7 @@ struct Config {
 
 
     // ------- ProfileBuffer.h --------
-    constexpr static const int bufferSize = 64;
+    constexpr static const int bufferSize = 256;
     constexpr static const double wavelengthMin = 0.02; // defined
     constexpr static const double wavelengthMax = 13.0;
     constexpr static const double waveNumberMin = 314.159; // wave number = 2pi/wavelength
@@ -51,8 +51,8 @@ struct Config {
 
 
     // -------- Solid-fluid Coupling --------
-    const float objUniformScale = 2.5; // scaling factor to scale the loaded meshes by
-    const float objMass = 25;
+    const float objUniformScale = 25; // scaling factor to scale the loaded meshes by
+    const float objMass = 15;
     const float fluidDensity = 0.001; // units are kg/m^3 --- this is the density of water
     // --------------------------------------
 

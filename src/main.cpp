@@ -27,7 +27,8 @@ int main(int argc, char *argv[])
 
     // Create a GUI window
     MainWindow w;
-    w.resize(600, 500);
+    w.resize(1000, 1500);
+    w.resize(800, 700);
     int desktopArea = QGuiApplication::primaryScreen()->size().width() *
                       QGuiApplication::primaryScreen()->size().height();
     int widgetArea = w.width() * w.height();
