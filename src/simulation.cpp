@@ -10,8 +10,6 @@
 using namespace std;
 using namespace Eigen;
 
-const float scale = 2.5;
-
 Simulation::Simulation()
     : m_amplitude()
 {}
@@ -23,18 +21,27 @@ void Simulation::update(double deltaTime) {
     }
     m_amplitude.timeStep(deltaTime);
     setWaterHeights();
+    if (config.rotateLeft) {
+        m_particleSystems[0]->rotateBoat(1);
+    }
+    else if (config.rotateRight) {
+        m_particleSystems[0]->rotateBoat(-1);
+    }
 }
 
 void Simulation::setWaterHeights() {
 //    std::vector<Eigen::Vector3f> new_vertices = m_shape.getVertices();
     for (int i = 0; i < undisturbedPoints.size(); i++) {
         Vector3f vertex = undisturbedPoints[i];
-        Vector2d xz = Vector2d(vertex.x() / (config.dimXY*scale) * (config.xMax - config.xMin) + config.xMin, vertex.z() / (config.dimXY*scale) * (config.yMax - config.yMin) + config.yMin);
+        Vector2d xz = Vector2d(vertex.x() / (config.dimXY*config.meshScale) * (config.xMax - config.xMin), vertex.z() / (config.dimXY*config.meshScale) * (config.yMax - config.yMin));
 //        std::cout << "Getting height at " << xz.x() << "," << xz.y() << std::endl;
-        Vector3f displacement = m_amplitude.waterHeight(xz).cast<float>();
-        newPoints[i].x() = vertex.x() + displacement.x();
-        newPoints[i].y() = displacement.z();
-        newPoints[i].z() = vertex.z() + displacement.y();
+        auto [displacement, normal] = m_amplitude.waterHeight(xz);
+        Vector3f displacementf = displacement.cast<float>();
+        Vector3f normalf = normal.cast<float>();
+        newPoints[i].x() = vertex.x() + displacementf.x();
+        newPoints[i].y() = displacementf.z();
+        newPoints[i].z() = vertex.z() + displacementf.y();
+        normals[i] = normalf;
     }
     m_shape.setVertices(newPoints);
 }
@@ -42,7 +49,7 @@ void Simulation::setWaterHeights() {
 void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 {
     // drop objects on the water surface mesh (calling these adds System() instances to m_particleSystems)
-    initFallingParticleSystem("./meshes/cube.obj", Vector3f(config.dimXY/2, 30, config.dimXY/2));
+    initFallingParticleSystem("./meshes/boat2.obj", Vector3f(0, 30, 0));
     // initFallingParticleSystem("./meshes/cube.obj", Vector3f(config.dimXY/4, 30, config.dimXY/4));
 
     // give all particleSystems access to the amplitude function (for solid-fluid coupling)
@@ -53,10 +60,10 @@ void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     std::vector<Vector3f> vertices;
     std::vector<Vector3i> triangles;
     int size = config.dimXY;
-
+    float half = size * config.meshScale * 0.5;
     for(int i = 0; i < size; ++i){
         for(int j = 0; j < size; ++j){
-            vertices.push_back(Vector3f(j * scale, 0, i * scale));
+            vertices.push_back(Vector3f(j * config.meshScale - half, 0, i * config.meshScale - half));
 
         }
     }
@@ -86,6 +93,7 @@ void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 
     undisturbedPoints = m_shape.getVertices();
     newPoints.resize(undisturbedPoints.size());
+    normals.resize(undisturbedPoints.size());
 }
 
 // initializes an obj to drop on the water surface mesh
@@ -104,6 +112,7 @@ void Simulation::initFallingParticleSystem(string meshPath, Vector3f startPos) {
 
         Shape* fallingShape = new Shape();
         fallingShape->init(vertices, triangles);
+        fallingShape->setColor(1,0,0);
 
         Eigen::Affine3f modelMatrix = Eigen::Affine3f::Identity();
         modelMatrix.scale(Eigen::Vector3f(config.objUniformScale, config.objUniformScale, config.objUniformScale)); // need to scale the obj coz the water mesh is way too large

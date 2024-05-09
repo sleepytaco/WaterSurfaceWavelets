@@ -85,7 +85,7 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
 // assuming deep water dispersion: this is the equation for omega' if omega = sqrt(gk)
 // TODO: this might be too simple and need to factor in additional terms
 double Amplitude::advectionSpeed(double waveNumber) {
-    return 0.5 * sqrt(config.g / waveNumber) * 10;
+    return 0.5 * sqrt(config.g / waveNumber);
 //    double val = config.g/(2 * sqrt(config.g * waveNumber + config.sigma * pow(waveNumber, 3)));
 //    return val;
 }
@@ -130,9 +130,11 @@ void Amplitude::precomputeProfileBuffers(double time) {
     m_profileBuffer.precompute(time);
 }
 
-Vector3d Amplitude::waterHeight(Vector2d pos) {
+std::tuple<Vector3d, Vector3d> Amplitude::waterHeight(Vector2d pos) {
     Vector3d total = Vector3d(0, 0, 0);
     double totalHeight = 0;
+    Vector3d totalXDeriv = Vector3d::Zero();
+    Vector3d totalYDeriv = Vector3d::Zero();
 
     for (int b = 0; b < numThetaSamples; b++) {
         double theta = 2.0 * M_PI * (double)b / (double)numThetaSamples;
@@ -152,14 +154,25 @@ Vector3d Amplitude::waterHeight(Vector2d pos) {
             // Gerstner Waves: https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf
             Vector2d profileXZ = waveDirection * profile.x();
             double amplitude = bilerp(posToIdxSpace(pos), b, waveNumber);
-            Vector3d profilePos = amplitude * Vector3d(profileXZ.x(), profile.y(), profileXZ.y());
+            Vector3d profilePos = amplitude * Vector3d(waveDirection.x() * profile.x(), profile.y(), waveDirection.y() * profile.z());
             Vector2d XZScalar = -waveDirection / waveNumber;
             profilePos = profilePos.cwiseProduct(Vector3d(XZScalar.x(), 1, XZScalar.y()));
             total += profilePos; // no shot this works first time. check here when things inevitably break
+            totalXDeriv += amplitude * waveDirection.x() * Vector3d(profile.z(), profile.w(), 0);
+            totalYDeriv += amplitude * waveDirection.y() * Vector3d(0, profile.w(), profile.z());
         }
     }
 
-    return total;
+    Vector3d normal = totalXDeriv.cross(totalYDeriv);
+    if (normal == Vector3d::Zero()) {
+        normal = Vector3d(0, 1, 0);
+    } else {
+//        std::cout << pos.x() << "," << pos.y() << " => " << normal.x() << "," << normal.y() << " " << normal.z() << std::endl;
+    }
+    normal = normal.normalized();
+    if (normal.y() < -0.001) normal *= -1;
+    if (normal.y() < 0.001) normal = Vector3d(0, 1, 0);
+    return {total, normal};
 }
 
 void Amplitude::timeStep(double dt) {

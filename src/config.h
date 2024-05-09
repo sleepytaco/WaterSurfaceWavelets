@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <math.h>
+#include "Eigen/Dense"
 
 #pragma once
 
@@ -45,16 +46,25 @@ struct Config {
     constexpr static const int numSubintervals = 50; // For integration
     constexpr static const double g = 9.81;
     constexpr static const double sigma = 	0.072;
-    constexpr static const double U = 1.0; // average wind speed
+    constexpr static const double U = 1.1; // average wind speed
     // ------------------------------
 
 
     // -------- Solid-fluid Coupling --------
-    const float objUniformScale = 5; // scaling factor to scale the loaded meshes by
-    const float objMass = 1;
-    const float fluidDensity = 997; // units are kg/m^3 --- this is the density of water
+    const float objUniformScale = 2.5; // scaling factor to scale the loaded meshes by
+    const float objMass = 25;
+    const float fluidDensity = 0.001; // units are kg/m^3 --- this is the density of water
     // --------------------------------------
 
+    //-------- Mesh --------
+    const float meshScale = 5;
+    // ---------------------
+
+    // Boat
+    Eigen::Vector3d driveForce;
+    float boatRotation = 0;
+    bool rotateLeft = false;
+    bool rotateRight = false;
 };
 
 // The global Config object

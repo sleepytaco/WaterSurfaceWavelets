@@ -21,7 +21,7 @@ private:
     double upper_bound;
     std::vector<Eigen::Vector3f> undisturbedPoints;
     std::vector<Eigen::Vector3f> newPoints;
-
+    std::vector<Eigen::Vector3f> normals;
 
     // ============== Solid-fluid Coupling related stuff
     std::vector<Shape*> m_fallingShapes; // global list of all falling objs in the scene
@@ -31,6 +31,8 @@ private:
 
     Solver* solver; // used to integrate the all m_particleSystems states forward in time (contains eulerstep, midpointstep, rk4 integrators)
     // ===========================================
+
+    Shape* boatShape;
 
 public:
     Simulation();
@@ -52,6 +54,9 @@ public:
     void draw(Shader *shader, GLenum mode)
     {
         m_shape.draw(shader, mode); // water surface mesh
+    }
+
+    void drawShapes(Shader *shader, GLenum mode) {
         for (int i=0; i<m_fallingShapes.size(); ++i) { // draw all the objs thrown on the water surface mesh
             m_fallingShapes[i]->draw(shader, mode);
         }

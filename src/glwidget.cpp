@@ -208,9 +208,12 @@ void GLWidget::paintGL()
     glUniform1f(glGetUniformLocation(m_defaultShader->getGLuint(), "u_reflection"), 1);
     glUniform1f(glGetUniformLocation(m_defaultShader->getGLuint(), "u_refraction"), 0);
     glUniform1f(glGetUniformLocation(m_defaultShader->getGLuint(), "u_materialRefractiveIndex"), 0);
+    glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 0);
     m_defaultShader->setUniform("proj", m_camera.getProjection());
     m_defaultShader->setUniform("view", m_camera.getView());
     m_sim.draw(m_defaultShader, GL_TRIANGLES);
+    glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 1);
+    m_sim.drawShapes(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();
 
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -327,6 +330,10 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_F: m_vertical -= SPEED; break;
     case Qt::Key_R: m_vertical += SPEED; break;
     case Qt::Key_C: m_camera.toggleIsOrbiting(); break;
+    case Qt::Key_Up: config.driveForce = Vector3d(1, 0, 0); break;
+    case Qt::Key_Down: config.driveForce = Vector3d(-1, 0, 0); break;
+    case Qt::Key_Left: config.rotateLeft = true; break;
+    case Qt::Key_Right: config.rotateRight = true; break;
     case Qt::Key_Escape: QApplication::quit();
     }
 }
@@ -343,6 +350,10 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
     case Qt::Key_D: m_sideways -= SPEED; break;
     case Qt::Key_F: m_vertical += SPEED; break;
     case Qt::Key_R: m_vertical -= SPEED; break;
+    case Qt::Key_Up: config.driveForce = Vector3d(0, 0, 0); break;
+    case Qt::Key_Down: config.driveForce = Vector3d(0, 0, 0); break;
+    case Qt::Key_Left: config.rotateLeft = false; break;
+    case Qt::Key_Right: config.rotateRight = false; break;
     }
 }
 
@@ -365,4 +376,5 @@ void GLWidget::tick()
 
     // Flag this view for repainting (Qt will call paintGL() soon after)
     update();
+
 }

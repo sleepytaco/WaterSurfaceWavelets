@@ -28,8 +28,11 @@ public:
 
     void init(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3i> &triangles);
     void setVertices(const std::vector<Eigen::Vector3f> &vertices);
+    void setVertices(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3f> &normals);
+
 
     void setModelMatrix(const Eigen::Affine3f &model);
+    void setModelMatrix(const Eigen::Matrix4f &model);
     void setupSkybox();
 
     void draw(Shader *shader, GLenum mode);
@@ -45,6 +48,8 @@ public:
 
     // making an assumption that all shapes are approximated by a sphere
     Eigen::Vector3f getShapeCentroid() {return shapeCentroid;};
+
+    void setColor(float r, float g, float b) {m_red=r; m_blue=b; m_green=g;}
 
 private:
     GLuint m_surfaceVao;
@@ -77,4 +82,11 @@ private:
                            std::vector<Eigen::Vector3f>& verts,
                            std::vector<Eigen::Vector3f>& normals,
                            std::vector<Eigen::Vector3f>& colors);
+
+    void updateMesh(const std::vector<Eigen::Vector3i> &triangles,
+                    const std::vector<Eigen::Vector3f> &vertices,
+                    const std::vector<Eigen::Vector3f> &normals,
+                    std::vector<Eigen::Vector3f>& verts,
+                    std::vector<Eigen::Vector3f>& norms,
+                    std::vector<Eigen::Vector3f>& colors);
 };
