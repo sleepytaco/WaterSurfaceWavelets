@@ -42,6 +42,10 @@ private:
     std::uniform_real_distribution<double> unif;
 
     int gridIndex(int i1, int i2, int i3, int i4){return i4 + k * (i3 + theta * (i2 + dims * i1));}
+
+    bool containment(int x, int y, int theta, int k){
+        return (x >= 0 && x < dims && y >= 0 && y < dims);
+    }
 };
 
 #endif // GRID_H
