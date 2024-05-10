@@ -73,13 +73,11 @@ void Grid::applyWind() {
     static std::uniform_real_distribution<double> thetaDelta(-1, 1);
     static std::uniform_real_distribution<double> ampScale(0, 1);
 
-    int thIdx = round(windDirection + thetaDelta(re)); // just to get some slight randomness in the wind direction each time
-    if (thIdx < 0) thIdx += config.dimTheta;
-    else if (thIdx > config.dimTheta) thIdx -= config.dimTheta;
-
     for (int i=0; i<=dims; ++i) { // a
         for (int j=0; j<=dims; ++j) { // a
-
+        int thIdx = round(windDirection + thetaDelta(re)); // just to get some slight randomness in the wind direction each time
+        if (thIdx < 0) thIdx += config.dimTheta;
+        else if (thIdx > config.dimTheta) thIdx -= config.dimTheta;
             double currA = this->get(i, j, thIdx, 0);
             this->set(i, j, thIdx, 0, currA + windIntensity*ampScale(re));
         }
