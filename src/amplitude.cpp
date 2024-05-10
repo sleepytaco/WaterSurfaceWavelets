@@ -119,7 +119,7 @@ void Amplitude::advectionStep(double dt) {
         }
     }
     std::swap(m_newAmplitude, m_currentAmplitude);
-    m_currentAmplitude.applyWind();
+    if (m_applyWindSim) m_currentAmplitude.applyWind();
 }
 
 

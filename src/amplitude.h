@@ -60,6 +60,8 @@ public:
 
     float delta(double waveNumber, double theta);
 
+    void toggleWind() { m_applyWindSim = !m_applyWindSim; };
+
     Grid m_currentAmplitude;
     Grid m_newAmplitude;
 
@@ -75,6 +77,8 @@ private:
     double m_time = 0.0; // accumulate time across timesteps
     double m_timeToChangeWind = 3.0;
     double m_timeAcc = 0.0;
+
+    bool m_applyWindSim = false;
 
     // number of samples for 4D amplitude grid
     const int dimXY = config.dimXY;

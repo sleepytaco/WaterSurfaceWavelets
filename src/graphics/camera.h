@@ -17,6 +17,7 @@ public:
     void rotate     (float deltaPitch, float deltaYaw);
 
     void lookAt(const Eigen::Vector3f &eye, const Eigen::Vector3f &target);
+    void setLook(const Eigen::Vector3f &look);
 
     void setOrbitPoint(const Eigen::Vector3f &target);
     bool getIsOrbiting();

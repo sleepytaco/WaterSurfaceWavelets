@@ -79,6 +79,10 @@ void Camera::lookAt(const Eigen::Vector3f &eye, const Eigen::Vector3f &target)
     updatePitchAndYaw();
 }
 
+void Camera::setLook(const Eigen::Vector3f &look) {
+    m_look = look.normalized();
+}
+
 // ================== Orbiting
 
 void Camera::setOrbitPoint(const Eigen::Vector3f &orbitPoint)
