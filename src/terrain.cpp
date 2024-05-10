@@ -14,10 +14,6 @@ Terrain::Terrain()
         randlookup.push_back(Vector2d(std::rand() * 2.0 / RAND_MAX - 1.0,
                                             std::rand() * 2.0 / RAND_MAX - 1.0));
     }
-
-
-
-
 }
 
 Terrain::~Terrain()

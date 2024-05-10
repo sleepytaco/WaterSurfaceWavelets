@@ -51,7 +51,7 @@ public:
 
     void precomputeProfileBuffers(double time);
 
-    std::tuple<Vector3d, Vector3d> waterHeight(Vector2d pos);
+    Vector3d waterHeight(Vector2d pos);
 
     void timeStep(double dt);
 

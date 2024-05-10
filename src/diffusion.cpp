@@ -46,7 +46,7 @@ double Amplitude::spatialDiffusion(double dt, Vector2d idxPos, int xIdx, int yId
     Vector2d advPos = advectionPos(idxPos, dt, theta_d, dK);
     int theta_refl = thetaIdx;
 
-    boundaryReflection(advPos, thetaIdx);
+    boundaryReflection(advPos, theta_refl);
 
     double ref_d = theta_refl * dTheta;
 
@@ -76,7 +76,7 @@ double Amplitude::spatialDiffusion(double dt, Vector2d idxPos, int xIdx, int yId
 
     double adv_t = (advPos - idxPos).norm()/dXY;
     double spatial_diffuse = catmullRom(nv, adv_t);
-    double angle_diffuse = diffusionStep(dt, spatial_diffuse, xIdx, yIdx, thetaIdx, waveNumber);
+    double angle_diffuse = diffusionStep(dt, spatial_diffuse, xIdx, yIdx, theta_refl, waveNumber);
 
     return angle_diffuse;
 }

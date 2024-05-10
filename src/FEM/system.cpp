@@ -113,7 +113,7 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
     }
 
     Vector2d particleSurfacePos = Vector2d(particlePos.x() / (config.dimXY*config.meshScale) * (config.xMax - config.xMin), particlePos.z() / (config.dimXY*config.meshScale) * (config.yMax - config.yMin));
-    auto [displacement, normal] = _amplitude4d->waterHeight(particleSurfacePos);
+    Vector3d displacement = _amplitude4d->waterHeight(particleSurfacePos);
     float waterSurfaceY = displacement.y();
 
     if (smallestShapeY - waterSurfaceY > 0) { // this means the entirity of the shape is above the water surface

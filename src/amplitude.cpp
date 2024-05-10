@@ -40,29 +40,9 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
     // Only apply boundary conditions if on boundary of grid
     // TODO: maybe also apply boudnary conditions if water is hitting terrain
 
-
     std::optional<Vector2d> levelset = boundary_check(advPos);
     double boundaryDistance = 1.0/config.bufferSize;
-    /*
-    if (advPos.x() < xMin + dXY) {
-        boundaryNormal = Vector2d(1, 0);
-        boundaryDistance = abs(advPos.x() - xMin);
-    }
-    else if (advPos.x() > xMax - dXY) {
-        boundaryNormal = Vector2d(-1, 0);
-        boundaryDistance = abs(advPos.x() - xMax);
-    }
-    else if (advPos.y() < yMin + dXY) {
-        boundaryNormal = Vector2d(0, 1);
-        boundaryDistance = abs(advPos.y() - yMin);
-    }
-    else if (advPos.y() > yMax - dXY) {
-        boundaryNormal = Vector2d(0, -1);
-        boundaryDistance = abs(advPos.y() - yMax);
-    }
-    else {
-        return;
-    }*/
+
     if(levelset.has_value()){
         Vector2d boundaryNormal = levelset.value();
         double theta = thetaIdx * dTheta;
@@ -138,11 +118,9 @@ void Amplitude::precomputeProfileBuffers(double time) {
     m_profileBuffer.precompute(time);
 }
 
-std::tuple<Vector3d, Vector3d> Amplitude::waterHeight(Vector2d pos) {
+Vector3d Amplitude::waterHeight(Vector2d pos) {
     Vector3d total = Vector3d(0, 0, 0);
     double totalHeight = 0;
-    Vector3d totalXDeriv = Vector3d::Zero();
-    Vector3d totalYDeriv = Vector3d::Zero();
 
     for (int b = 0; b < numThetaSamples; b++) {
         double theta = 2.0 * M_PI * (double)b / (double)numThetaSamples;
@@ -166,21 +144,10 @@ std::tuple<Vector3d, Vector3d> Amplitude::waterHeight(Vector2d pos) {
             Vector2d XZScalar = -waveDirection / waveNumber;
             profilePos = profilePos.cwiseProduct(Vector3d(XZScalar.x(), 1, XZScalar.y()));
             total += profilePos; // no shot this works first time. check here when things inevitably break
-            totalXDeriv += amplitude * waveDirection.x() * Vector3d(profile.z(), profile.w(), 0);
-            totalYDeriv += amplitude * waveDirection.y() * Vector3d(0, profile.w(), profile.z());
         }
     }
 
-    Vector3d normal = totalXDeriv.cross(totalYDeriv);
-    if (normal == Vector3d::Zero()) {
-        normal = Vector3d(0, 1, 0);
-    } else {
-//        std::cout << pos.x() << "," << pos.y() << " => " << normal.x() << "," << normal.y() << " " << normal.z() << std::endl;
-    }
-    normal = normal.normalized();
-    if (normal.y() < -0.001) normal *= -1;
-    if (normal.y() < 0.001) normal = Vector3d(0, 1, 0);
-    return {total, normal};
+    return total;
 }
 
 void Amplitude::timeStep(double dt) {
