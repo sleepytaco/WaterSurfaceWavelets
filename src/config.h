@@ -17,7 +17,7 @@ struct Config {
     const int numThetaSamples = 16;
 
     // number of samples for 4D amplitude grid
-    const int dimXY = 128; // we assume same X and Y samples
+    const int dimXY = 64; // we assume same X and Y samples
     const int dimTheta = 16;
     const int dimK = 1;
 

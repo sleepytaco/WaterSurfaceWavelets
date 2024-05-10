@@ -46,7 +46,7 @@ double Amplitude::spatialDiffusion(double dt, Vector2d idxPos, int xIdx, int yId
     Vector2d advPos = advectionPos(idxPos, dt, theta_d, dK);
     int theta_refl = thetaIdx;
 
-    boundaryReflection(advPos, thetaIdx);
+    //boundaryReflection(advPos, thetaIdx);
 
     double ref_d = theta_refl * dTheta;
 

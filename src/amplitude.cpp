@@ -68,6 +68,10 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
         double theta = thetaIdx * dTheta;
         Vector2d waveDirection = Vector2d(cos(theta), sin(theta));
 
+        if(waveDirection.dot(boundaryNormal)<0){
+            boundaryNormal*=-1;
+        }
+
         Vector2d advPos_refl = advPos + 2 * boundaryDistance * boundaryNormal;
     //    if (advPos_refl != advPos)
     //        std::cout << advPos.x() << "," << advPos.y() << " -> " << advPos_refl.x() << "," << advPos_refl.y() << std::endl;
