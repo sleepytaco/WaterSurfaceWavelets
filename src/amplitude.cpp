@@ -42,7 +42,7 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
 
 
     std::optional<Vector2d> levelset = boundary_check(advPos);
-    double boundaryDistance = 0;
+    double boundaryDistance = 1;
     /*
     if (advPos.x() < xMin + dXY) {
         boundaryNormal = Vector2d(1, 0);
