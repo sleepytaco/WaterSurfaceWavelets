@@ -68,7 +68,7 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
         double theta = thetaIdx * dTheta;
         Vector2d waveDirection = Vector2d(cos(theta), sin(theta));
 
-        if(waveDirection.dot(boundaryNormal)<0){
+        if(waveDirection.dot(boundaryNormal)>0){
             boundaryNormal*=-1;
         }
 
