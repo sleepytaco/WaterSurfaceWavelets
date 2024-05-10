@@ -70,7 +70,7 @@ double Terrain::getHeight(double x, double y){
     // Task 7: combine multiple different octaves of noise to produce fractal perlin noise
 
     // Return 0 as placeholder
-    return z_2 + z_4 + z_8 + z_16;
+    return (z_2 + z_4 + z_8 + z_16) - 0.05;
 }
 
 float interpolate(float A, float B, float alpha) {

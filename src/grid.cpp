@@ -38,12 +38,7 @@ double& Grid::get(Vector2i pos, int theta, int k) {
 
 double Grid::get(int x, int y, int theta, int k) {
     if(!containment(x, y, theta, k)){
-        if(theta == 5)
-        return 10;
-        else
         return unif(re);
-
-
     }
 //    x%=dims;
 //    y%=dims;

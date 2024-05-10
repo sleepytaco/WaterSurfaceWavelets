@@ -41,7 +41,7 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
     // TODO: maybe also apply boudnary conditions if water is hitting terrain
 
     std::optional<Vector2d> levelset = boundary_check(advPos);
-    double boundaryDistance = 1.0/config.bufferSize;
+    double boundaryDistance = 0.2;
 
     if(levelset.has_value()){
         Vector2d boundaryNormal = levelset.value();
