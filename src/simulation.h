@@ -56,13 +56,17 @@ public:
     void draw(Shader *shader, GLenum mode)
     {
         m_shape.draw(shader, mode); // water surface mesh
-        m_terrain.draw(shader, mode);
+
     }
 
     void drawShapes(Shader *shader, GLenum mode) {
         for (int i=0; i<m_fallingShapes.size(); ++i) { // draw all the objs thrown on the water surface mesh
             m_fallingShapes[i]->draw(shader, mode);
         }
+    }
+
+    void drawTerrain(Shader *shader, GLenum mode){
+        m_terrain.draw(shader, mode);
     }
 
     SelectMode select(Shader *shader, int vertex)

@@ -67,7 +67,7 @@ void GLWidget::initializeGL()
     glClearColor(1, 1, 1, 1);
 
     // Enable depth-testing and backface culling
-//    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
@@ -211,9 +211,12 @@ void GLWidget::paintGL()
     glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 0);
     m_defaultShader->setUniform("proj", m_camera.getProjection());
     m_defaultShader->setUniform("view", m_camera.getView());
+    glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 2);
+    m_sim.drawTerrain(m_defaultShader, GL_TRIANGLES);
     m_sim.draw(m_defaultShader, GL_TRIANGLES);
     glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 1);
     m_sim.drawShapes(m_defaultShader, GL_TRIANGLES);
+
     m_defaultShader->unbind();
 
     glClear(GL_DEPTH_BUFFER_BIT);

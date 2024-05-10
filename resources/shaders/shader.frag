@@ -63,6 +63,12 @@ void main() {
         float c = clamp(dot(normal_cameraSpace, lightDir), 0, 1);
         fragColor = vec4(red * c, green * c, blue * c, 1);
     }
+
+    else if (drawmode == 2){
+        vec3 lightDir = normalize(vec3(0, 0.5, 1));
+        float c = clamp(dot(normal_cameraSpace, lightDir), 0, 1);
+        fragColor = vec4(red * c, green * c, blue * c, 1);
+    }
 }
 
 //void main() {

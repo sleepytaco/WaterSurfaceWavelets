@@ -16,6 +16,8 @@ Terrain::Terrain()
     }
 
 
+
+
 }
 
 Terrain::~Terrain()
@@ -26,6 +28,7 @@ Terrain::~Terrain()
 void Terrain::init(){
     std::vector<Vector3f> vertices;
     std::vector<Vector3i> triangles;
+
     for(int i = 0; i < resolution; ++i){
         for(int j = 0; j < resolution; ++j){
             vertices.push_back(getPosition(i, j));
@@ -45,6 +48,7 @@ void Terrain::init(){
 
     }
     this->m_shape.init(vertices, triangles);
+    m_shape.setColor(0.74,0.6,0.74);
 }
 
 
@@ -53,8 +57,11 @@ Vector3f Terrain::getPosition(int x, int y) {
     // makes scaling independent of sampling resolution.
     float xn = (1.0 * x) / resolution;
     float yn = (1.0 * y) / resolution;
-    float z = getHeight(xn, yn);
-    return Vector3f(x * resolution,z * resolution, y * resolution);
+    float z = getHeight(xn, yn) * resolution * config.meshScale;
+    float half = resolution * config.meshScale * 0.5;
+    return Vector3f(y * config.meshScale - half,
+                    z,
+                    x * config.meshScale - half);
 }
 
 double Terrain::getHeight(double x, double y){
