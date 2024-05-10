@@ -15,7 +15,7 @@ Camera::Camera()
       m_projDirty(true),
       m_fovY(90),
       m_aspect(1),
-      m_near(0.1f),
+      m_near(10.f),
       m_far(50.f),
       m_zoom(1)
 {}

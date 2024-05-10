@@ -211,11 +211,12 @@ void GLWidget::paintGL()
     glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 0);
     m_defaultShader->setUniform("proj", m_camera.getProjection());
     m_defaultShader->setUniform("view", m_camera.getView());
+
     glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 2);
     m_sim.drawTerrain(m_defaultShader, GL_TRIANGLES);
-    m_sim.draw(m_defaultShader, GL_TRIANGLES);
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 0);
+    m_sim.draw(m_defaultShader, GL_TRIANGLES);
 
     glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 1);
     m_sim.drawShapes(m_defaultShader, GL_TRIANGLES);
