@@ -22,7 +22,7 @@ Grid::Grid()
 //                if ((i >= 50 && i <= 80 && j >= 50 && j <= 80))
                 //                if (j >= 100)
                 //m_currentAmplitude.get(i, j, theta, 0) = unif(re) * sin((i + j) / 2);
-                this->set(i, j, th, 0, init(re));
+//                this->set(i, j, th, 0, init(re));
 
             }
         }
@@ -55,17 +55,31 @@ void Grid::set(int x, int y, int theta, int k, double A){
     amplitudeGrid[gridIndex(x,  y, theta, k)] = A;
 }
 
+void Grid::changeWind() {
+    static std::uniform_real_distribution<double> dirDelta(-3, 3);
+    static std::uniform_real_distribution<double> intensityDelta(-2, 2);
+
+    windDirection += dirDelta(re);
+    if (windDirection < 0) windDirection += config.dimTheta;
+    else if (windDirection > config.dimTheta) windDirection -= config.dimTheta;
+
+    windIntensity += intensityDelta(re);
+    if (windIntensity < 0) windIntensity += 7;
+    else if (windIntensity > 7) windIntensity -= 7;
+}
+
 void Grid::applyWind() {
 
-    std::uniform_real_distribution<double> ampUpperBound(2, 5);
-    std::uniform_real_distribution<double> thetaIdx(3, 10);
-    std::uniform_real_distribution<double> ampRand(0, ampUpperBound(re));
+    static std::uniform_real_distribution<double> thetaDelta(-1, 1);
+    static std::uniform_real_distribution<double> ampScale(0, 1);
 
     for (int i=0; i<=dims; ++i) { // a
         for (int j=0; j<=dims; ++j) { // a
-            int thIdx = round(thetaIdx(re)); // just to get some slight randomness in the wind direction each time
+        int thIdx = round(windDirection + thetaDelta(re)); // just to get some slight randomness in the wind direction each time
+        if (thIdx < 0) thIdx += config.dimTheta;
+        else if (thIdx > config.dimTheta) thIdx -= config.dimTheta;
             double currA = this->get(i, j, thIdx, 0);
-            this->set(i, j, thIdx, 0, currA+ampRand(re));
+            this->set(i, j, thIdx, 0, currA + windIntensity*ampScale(re));
         }
     }
 }

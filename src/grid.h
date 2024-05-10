@@ -26,6 +26,7 @@ public:
     std::vector<Vector3i>& getTriangles(){return triangles;}
 
     void applyWind();
+    void changeWind();
 private:
     int lower_bound = -10;
     int upper_bound = 10;
@@ -46,6 +47,9 @@ private:
     bool containment(int x, int y, int theta, int k){
         return (x >= 0 && x < dims && y >= 0 && y < dims);
     }
+
+    double windDirection = 0;
+    double windIntensity = 3;
 };
 
 #endif // GRID_H
