@@ -81,6 +81,7 @@ void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     }
 
     m_shape.init(vertices, triangles);
+    m_terrain.init();
 
 
     MatrixX3f all_vertices = MatrixX3f(vertices.size(), 3);

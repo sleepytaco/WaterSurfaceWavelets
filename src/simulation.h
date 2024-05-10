@@ -7,6 +7,7 @@
 #include "grid.h"
 #include <random>
 #include "FEM/solver.h"
+#include "terrain.h"
 
 class Shader;
 
@@ -15,6 +16,7 @@ class Simulation
 private:
     Shape m_shape; // this is the water surface mesh (scared to rename this as the ARAP boilerplate relies on this literally everywhere)
     Amplitude m_amplitude;
+    Terrain m_terrain;
     std::uniform_real_distribution<double> unif;
     std::default_random_engine re;
     double lower_bound;
@@ -54,6 +56,7 @@ public:
     void draw(Shader *shader, GLenum mode)
     {
         m_shape.draw(shader, mode); // water surface mesh
+        m_terrain.draw(shader, mode);
     }
 
     void drawShapes(Shader *shader, GLenum mode) {

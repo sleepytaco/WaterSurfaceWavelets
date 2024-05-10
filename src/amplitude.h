@@ -54,6 +54,8 @@ public:
 
     void timeStep(double dt);
 
+    void levelset(std::vector<Vector3f>& terrain);
+
     float gamma(double waveNumber, double theta);
 
     float delta(double waveNumber, double theta);

@@ -69,6 +69,7 @@ add_executable(${PROJECT_NAME}
     src/grid.h src/grid.cpp
     src/interpolation.cpp
     src/graphics/stb_image.h
+    src/terrain.h src/terrain.cpp
 
 
 )
