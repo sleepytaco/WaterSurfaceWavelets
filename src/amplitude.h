@@ -5,6 +5,7 @@
 #include "profilebuffer.h"
 
 #include <iostream>
+#include <optional>
 #include <unordered_set>
 #include <deque>
 #include <set>
@@ -54,7 +55,7 @@ public:
 
     void timeStep(double dt);
 
-    void levelset(std::vector<Vector3f>& terrain);
+    void init_ls(std::vector<Vector3f>& terrain);
 
     float gamma(double waveNumber, double theta);
 
@@ -71,6 +72,13 @@ private:
     double catmullRom(std::vector<double>& segments, double adv_t);
 
     double spatialDiffusion(double dt, Vector2d idxPos, int xIdx, int yIdx, int thetaIdx, double waveNumber);
+
+
+    //checking boundaries
+
+    std::optional<Vector2d> boundary_check(Vector2d pos);
+
+
 
     double m_time = 0.0; // accumulate time across timesteps
     double m_timeToChangeWind = 3.0;
@@ -91,6 +99,8 @@ private:
     double yMin=config.yMin; double yMax=config.yMax;
     double thetaMin=config.thetaMin; double thetaMax=config.thetaMax;  double dTheta=config.dTheta;
     double kMin=config.kMin; double kMax=config.kMax; double dK=config.dK;
+
+    std::vector<Vector3f> terrain;
 
     ProfileBuffer m_profileBuffer;
 };

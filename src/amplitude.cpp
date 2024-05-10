@@ -39,8 +39,11 @@ Vector2d Amplitude::posToIdxSpace(Vector2d pos) {
 void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
     // Only apply boundary conditions if on boundary of grid
     // TODO: maybe also apply boudnary conditions if water is hitting terrain
-    Vector2d boundaryNormal = Vector2d(0, 0);
+
+
+    std::optional<Vector2d> levelset = boundary_check(advPos);
     double boundaryDistance = 0;
+    /*
     if (advPos.x() < xMin + dXY) {
         boundaryNormal = Vector2d(1, 0);
         boundaryDistance = abs(advPos.x() - xMin);
@@ -59,23 +62,25 @@ void Amplitude::boundaryReflection(Vector2d& advPos, int& thetaIdx) {
     }
     else {
         return;
+    }*/
+    if(levelset.has_value()){
+        Vector2d boundaryNormal = levelset.value();
+        double theta = thetaIdx * dTheta;
+        Vector2d waveDirection = Vector2d(cos(theta), sin(theta));
+
+        Vector2d advPos_refl = advPos + 2 * boundaryDistance * boundaryNormal;
+    //    if (advPos_refl != advPos)
+    //        std::cout << advPos.x() << "," << advPos.y() << " -> " << advPos_refl.x() << "," << advPos_refl.y() << std::endl;
+        advPos = advPos_refl;
+        // assert(advPos.x() >= xMin && advPos.x() <= xMax && advPos.y() >= yMin && advPos.y() <= yMax);
+
+        Vector2d k_refl = waveDirection - 2 * (boundaryNormal.dot(waveDirection)) * boundaryNormal;
+        double theta_refl = atan2(k_refl.y(), k_refl.x());
+    //    std::cout << theta * 180 / M_PI << " -> " << theta_refl * 180 / M_PI << " " << boundaryNormal.x() << "," << boundaryNormal.y() << std::endl;
+        if (theta_refl < 0) theta_refl += 2*M_PI;
+        int thetaIdx_refl = floor(theta_refl / dTheta);
+        thetaIdx = thetaIdx_refl;
     }
-
-    double theta = thetaIdx * dTheta;
-    Vector2d waveDirection = Vector2d(cos(theta), sin(theta));
-
-    Vector2d advPos_refl = advPos + 2 * boundaryDistance * boundaryNormal;
-//    if (advPos_refl != advPos)
-//        std::cout << advPos.x() << "," << advPos.y() << " -> " << advPos_refl.x() << "," << advPos_refl.y() << std::endl;
-    advPos = advPos_refl;
-    // assert(advPos.x() >= xMin && advPos.x() <= xMax && advPos.y() >= yMin && advPos.y() <= yMax);
-
-    Vector2d k_refl = waveDirection - 2 * (boundaryNormal.dot(waveDirection)) * boundaryNormal;
-    double theta_refl = atan2(k_refl.y(), k_refl.x());
-//    std::cout << theta * 180 / M_PI << " -> " << theta_refl * 180 / M_PI << " " << boundaryNormal.x() << "," << boundaryNormal.y() << std::endl;
-    if (theta_refl < 0) theta_refl += 2*M_PI;
-    int thetaIdx_refl = floor(theta_refl / dTheta);
-    thetaIdx = thetaIdx_refl;
 }
 
 // assuming deep water dispersion: this is the equation for omega' if omega = sqrt(gk)
@@ -114,6 +119,7 @@ void Amplitude::advectionStep(double dt) {
 
 //                std::cout << A << std::endl;
                 m_newAmplitude.set(i, j, theta, 0, A);
+
 
             }
         }

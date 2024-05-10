@@ -83,6 +83,8 @@ void Simulation::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     m_shape.init(vertices, triangles);
     m_terrain.init();
 
+    this->m_amplitude.init_ls(m_terrain.get());
+
 
     MatrixX3f all_vertices = MatrixX3f(vertices.size(), 3);
     int i = 0;

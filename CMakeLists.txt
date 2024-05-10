@@ -70,6 +70,7 @@ add_executable(${PROJECT_NAME}
     src/interpolation.cpp
     src/graphics/stb_image.h
     src/terrain.h src/terrain.cpp
+    src/levelset.cpp
 
 
 )

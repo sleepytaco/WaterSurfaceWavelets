@@ -26,12 +26,11 @@ Terrain::~Terrain()
 }
 
 void Terrain::init(){
-    std::vector<Vector3f> vertices;
     std::vector<Vector3i> triangles;
 
     for(int i = 0; i < resolution; ++i){
         for(int j = 0; j < resolution; ++j){
-            vertices.push_back(getPosition(i, j));
+            m_vertices.push_back(getPosition(i, j));
         }
     }
 
@@ -47,7 +46,7 @@ void Terrain::init(){
         }
 
     }
-    this->m_shape.init(vertices, triangles);
+    this->m_shape.init(m_vertices, triangles);
     m_shape.setColor(0.74,0.6,0.74);
 }
 

@@ -26,6 +26,8 @@ public:
         m_shape.draw(shader, mode);
     }
 
+    std::vector<Vector3f>& get(){return m_vertices;}
+
 private:
     Vector2d sample_vector(int x, int y);
 
@@ -43,7 +45,9 @@ private:
 
     std::vector<Vector2d> randlookup;
 
-    std::vector<Vector3d> m_vertices;
+    std::vector<Vector3f> m_vertices;
+
+
 };
 
 #endif // TERRAIN_H
