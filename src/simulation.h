@@ -36,6 +36,8 @@ private:
 
     Shape* boatShape;
 
+    bool m_applyWindSim = true;
+
 public:
     Simulation();
 
@@ -44,6 +46,8 @@ public:
 
     void setWaterHeights();
     void update(double deltaTime);
+
+    void toggleWind() { print("toggled wind"); m_amplitude.toggleWind(); };
 
 
     // ================== If You Choose To Modify The Code Below, It's On You

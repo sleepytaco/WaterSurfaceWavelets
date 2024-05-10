@@ -146,16 +146,18 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
     int thetaIndex = static_cast<int>(thetaX / (2 * M_PI / config.dimTheta)); // convert angle to bin index
 
     // "spreading" the amplitude over a range around the thetaIdx
-    int thetaRange = 3;
-    int minTheta = thetaIndex - thetaRange;
-    if (minTheta < 0) minTheta += config.dimTheta;
-    int maxTheta = thetaIndex + thetaRange;
-    if (maxTheta > config.dimTheta-1) maxTheta -= config.dimTheta;
+    int thetaRange = 4;
+//    int minTheta = thetaIndex - thetaRange;
+//    if (minTheta < 0) minTheta += config.dimTheta;
+//    int maxTheta = thetaIndex + thetaRange;
+//    if (maxTheta > config.dimTheta-1) maxTheta -= config.dimTheta;
+    int minTheta = std::max(thetaIndex - thetaRange, 0);
+    int maxTheta = std::min(thetaIndex + thetaRange, config.dimTheta);
 
     for (int theta=minTheta; theta<=maxTheta; ++theta) { // b
 //        double currentAmp = _amplitude4d->m_currentAmplitude.get(i, j, theta, 0);
 //        double fluidEnergy = 0.5 * config.fluidDensity * config.g * currentAmp * currentAmp;
-        double newAmp = 30; // 2 / (rho * 1000 * config.g) * (rigidEnergyDelta / config.dimTheta);
+        double newAmp = -20; // 2 / (rho * 1000 * config.g) * (rigidEnergyDelta / config.dimTheta);
 
         for (int k = -1; k <= 1; k++) {
             for (int l = -1; l <= 1; l++) {

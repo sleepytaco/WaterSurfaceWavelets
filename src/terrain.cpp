@@ -46,8 +46,10 @@ void Terrain::init(){
         }
 
     }
+
     this->m_shape.init(m_vertices, triangles);
-    m_shape.setColor(0.74,0.6,0.74);
+    m_shape.setColor(0.65,0.41,0.33);
+
 }
 
 

@@ -95,10 +95,17 @@ void GLWidget::initializeGL()
 
     // Initialize camera with a reasonable transform
     Eigen::Vector3f eye    = center - Eigen::Vector3f::UnitZ() * (extentLength-300) + Eigen::Vector3f::UnitY() * 300 + Eigen::Vector3f::UnitX() * 400;
+
+    // hardcoded a good camera perspective
+    eye = Eigen::Vector3f(-225,  80, -365);
+    Eigen::Vector3f lookVector( 0.203841, -0.0458975,   0.977927);
+
     Eigen::Vector3f target = center;
     m_camera.lookAt(eye, target);
     m_camera.setOrbitPoint(target);
     m_camera.setPerspective(120, width() / static_cast<float>(height()), nearPlane, farPlane);
+
+    m_camera.setLook(lookVector);
 
     m_deltaTimeProvider.start();
     m_intervalTimer.start(1000 / 60);
@@ -211,11 +218,12 @@ void GLWidget::paintGL()
     glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 0);
     m_defaultShader->setUniform("proj", m_camera.getProjection());
     m_defaultShader->setUniform("view", m_camera.getView());
+
     glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 2);
     m_sim.drawTerrain(m_defaultShader, GL_TRIANGLES);
-    m_sim.draw(m_defaultShader, GL_TRIANGLES);
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 0);
+    m_sim.draw(m_defaultShader, GL_TRIANGLES);
 
     glUniform1i(glGetUniformLocation(m_defaultShader->getGLuint(), "drawmode"), 1);
     m_sim.drawShapes(m_defaultShader, GL_TRIANGLES);
@@ -341,6 +349,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Left: config.rotateLeft = true; break;
     case Qt::Key_Right: config.rotateRight = true; break;
     case Qt::Key_Escape: QApplication::quit();
+    case Qt::Key_T: m_sim.toggleWind(); break;
     }
 }
 
