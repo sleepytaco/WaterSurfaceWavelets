@@ -29,11 +29,10 @@ std::optional<Vector2d> Amplitude::boundary_check(Vector2d pos){
                                     q22 * dx * dy).y();
 
         if(interpolatedValue > 0){
-            double d1 = (q21 - q11).y();
-            double d2 = (q12 - q11).y();
-            Vector3f v1 = Vector3f(5, d1, 0);
-            Vector3f v2 = Vector3f(0, d2, 5);
-            Vector3f normal = v1.cross(v2);
+            Vector3f d1 = (q21 - q11);
+            Vector3f d2 = (q12 - q11);
+
+            Vector3f normal = d1.cross(d2);
             Vector2d normal2d = Vector2d(normal.x(), normal.z()).normalized();
             return std::optional<Vector2d>{normal2d};
         }
