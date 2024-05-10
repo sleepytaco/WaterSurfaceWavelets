@@ -102,38 +102,29 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
     Vector3f particlePos = getWorldSpacePos(particlePosMatSpace, fallingShape->getModelMatrix()); // particle pos in world space
     Vector3f particleVelocity = currParticleStates.col(0).tail(3);
 
-    // float shapeRadius = 5; // TODO: get from config file or calc it
-
     // get smallest/lowest y-coord of all the vertices in the falling shape obj
     float smallestShapeY = particlePos.y();
+
     // Vector3f lowestShapeVertex = particlePos;
-//    for (int i=0; i<numParticles; ++i) {   // dont really need this tbh, unless we want it to bounce with the waves
-//        particlePosMatSpace = currParticleStates.col(i).head(3); // retrieve the relevant particle position from state
-//        particlePos = getWorldSpacePos(particlePosMatSpace, fallingShape->getModelMatrix()); // particle pos in world space
+    for (int i=0; i<numParticles; ++i) {   // dont really need this tbh, unless we want it to bounce with the waves
+        particlePosMatSpace = currParticleStates.col(i).head(3); // retrieve the relevant particle position from state
+        particlePos = getWorldSpacePos(particlePosMatSpace, fallingShape->getModelMatrix()); // particle pos in world space
+        smallestShapeY = std::min(smallestShapeY, particlePos.y());
+    }
 
-//        if (particlePos.y() < smallestShapeY) {
-//            smallestShapeY = std::min(smallestShapeY, particlePos.y());
-//            lowestShapeVertex = particlePos;
-//            particleVelocity = currParticleStates.col(i).tail(3);
-//        }
-//    }
-
-
-    // particlePos = lowestShapeVertex;
     Vector2d particleSurfacePos = Vector2d(particlePos.x() / (config.dimXY*config.meshScale) * (config.xMax - config.xMin), particlePos.z() / (config.dimXY*config.meshScale) * (config.yMax - config.yMin));
     auto [displacement, normal] = _amplitude4d->waterHeight(particleSurfacePos);
     float waterSurfaceY = displacement.y();
 
-//    if (smallestShapeY - waterSurfaceY > 0) { // this means the entirity of the shape is above the water surface
-//        return buoyancyForce; // return 0 force
-//    }
-
-    // formula from paper
-//    float h = fmin(waterSurfaceY - smallestShapeY, shapeRadius); // TODO: don't fully get what this is
-//    float V = M_PI * shapeRadius * shapeRadius * h; // "volume" of submerged portion
-//    float rho = config.fluidDensity;
-//    buoyancyForce = -_g * rho * V;
-    buoyancyForce = -_g * (0-smallestShapeY); // idea is to make force approx whatever is necessary to keep the boat afloat
+    if (smallestShapeY - waterSurfaceY > 0) { // this means the entirity of the shape is above the water surface
+        buoyancyForce = Vector3f::Zero(); // return 0 force
+    } else {
+        // formula from paper
+        float h = fmin(waterSurfaceY - smallestShapeY, config.shapeRadius);
+        float V = M_PI * config.shapeRadius * config.shapeRadius * h; // "volume" of submerged portion
+        float rho = config.fluidDensity;
+        buoyancyForce = -_g * rho * V;
+    }
 
     Vector2d idxSpacePos = _amplitude4d->posToIdxSpace(particleSurfacePos);
     double idxSpaceX = idxSpacePos.x();
@@ -154,22 +145,24 @@ Vector3f System::calculateBuoyancyForce(MatrixXf& currParticleStates) {
     if (thetaX < 0) thetaX += 2 * M_PI; // ensure angle is in [0, 2*pi)
     int thetaIndex = static_cast<int>(thetaX / (2 * M_PI / config.dimTheta)); // convert angle to bin index
 
-    // "spreading" the amplitude over a range around the thetaIdx (not exactly right...? as i dont do any modulo and clamp to 0/16 at boundaries)
-    int thetaRange = 4;
-    int minTheta = std::max(thetaIndex - thetaRange, 0);
-    int maxTheta = std::min(thetaIndex + thetaRange, config.dimTheta);
+    // "spreading" the amplitude over a range around the thetaIdx
+    int thetaRange = 3;
+    int minTheta = thetaIndex - thetaRange;
+    if (minTheta < 0) minTheta += config.dimTheta;
+    int maxTheta = thetaIndex + thetaRange;
+    if (maxTheta > config.dimTheta-1) maxTheta -= config.dimTheta;
 
     for (int theta=minTheta; theta<=maxTheta; ++theta) { // b
-        // double currentAmp = _amplitude4d->m_currentAmplitude.get(i, j, theta, 0);
-//        double fluidEnergy = 0.5 * rho * config.g * currentAmp * currentAmp;
-        double newAmp = -50; // 2 / (rho * 1000 * config.g) * (rigidEnergyDelta / config.dimTheta);
+//        double currentAmp = _amplitude4d->m_currentAmplitude.get(i, j, theta, 0);
+//        double fluidEnergy = 0.5 * config.fluidDensity * config.g * currentAmp * currentAmp;
+        double newAmp = 30; // 2 / (rho * 1000 * config.g) * (rigidEnergyDelta / config.dimTheta);
 
-        _amplitude4d->m_currentAmplitude.set(i, j, theta, 0, newAmp);
-        for (int idx=1; idx<5; ++idx) {
-            _amplitude4d->m_currentAmplitude.set(i-idx, j-idx, theta, 0, newAmp);
-            _amplitude4d->m_currentAmplitude.set(i-idx, j, theta, 0, newAmp);
-            _amplitude4d->m_currentAmplitude.set(i, j-idx, theta, 0, newAmp);
+        for (int k = -1; k <= 1; k++) {
+            for (int l = -1; l <= 1; l++) {
+                _amplitude4d->m_currentAmplitude.set(i+k, j+l, theta, 0, newAmp);
+            }
         }
+
     }
 
     return buoyancyForce;

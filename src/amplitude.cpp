@@ -4,10 +4,6 @@
 
 Amplitude::Amplitude() {
     std::cout << "amplitude constructor" << std::endl;
-    double lower_bound = -50;
-    double upper_bound = 50;
-    std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
-    std::default_random_engine re;
 
     m_currentAmplitude = Grid();
     m_newAmplitude = Grid();
@@ -179,7 +175,16 @@ std::tuple<Vector3d, Vector3d> Amplitude::waterHeight(Vector2d pos) {
 
 void Amplitude::timeStep(double dt) {
     m_time += dt;
+    m_timeAcc += dt;
     advectionStep(dt);
     precomputeProfileBuffers(m_time);
+
+    static std::uniform_real_distribution<double> changeTime(2,5);
+    static std::default_random_engine re;
+    if (m_timeAcc > m_timeToChangeWind) {
+        m_timeAcc = 0;
+        m_timeToChangeWind = changeTime(re);
+        m_currentAmplitude.changeWind();
+    }
 //    print("sim time elapsed: " + std::to_string(m_time));
 }

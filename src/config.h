@@ -36,7 +36,7 @@ struct Config {
 
 
     // ------- ProfileBuffer.h --------
-    constexpr static const int bufferSize = 256;
+    constexpr static const int bufferSize = 128;
     constexpr static const double wavelengthMin = 0.02; // defined
     constexpr static const double wavelengthMax = 13.0;
     constexpr static const double waveNumberMin = 314.159; // wave number = 2pi/wavelength
@@ -51,8 +51,8 @@ struct Config {
 
 
     // -------- Solid-fluid Coupling --------
-    const float objUniformScale = 25; // scaling factor to scale the loaded meshes by
-    const float objMass = 15;
+    const float objUniformScale = 3; // scaling factor to scale the loaded meshes by
+    const float objMass = 5.0;
     const float fluidDensity = 0.001; // units are kg/m^3 --- this is the density of water
     // --------------------------------------
 
@@ -63,6 +63,7 @@ struct Config {
     // Boat
     Eigen::Vector3d driveForce;
     float boatRotation = 0;
+    float shapeRadius = 2.5;
     bool rotateLeft = false;
     bool rotateRight = false;
 };

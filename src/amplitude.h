@@ -71,6 +71,8 @@ private:
     double spatialDiffusion(double dt, Vector2d idxPos, int xIdx, int yIdx, int thetaIdx, double waveNumber);
 
     double m_time = 0.0; // accumulate time across timesteps
+    double m_timeToChangeWind = 3.0;
+    double m_timeAcc = 0.0;
 
     // number of samples for 4D amplitude grid
     const int dimXY = config.dimXY;
