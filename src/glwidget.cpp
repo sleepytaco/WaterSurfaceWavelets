@@ -67,7 +67,7 @@ void GLWidget::initializeGL()
     glClearColor(1, 1, 1, 1);
 
     // Enable depth-testing and backface culling
-    glEnable(GL_DEPTH_TEST);
+//    glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
